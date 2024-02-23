@@ -1,40 +1,28 @@
 # Quick Start
 
-{% hint style="info" %}
-**Good to know:** A quick start guide can be good to help folks get up and running with your API in a few steps. Some people prefer diving in with the basics rather than meticulously reading every page of documentation!
-{% endhint %}
+## Setting the Scene
+
+There are 3 basic components in an SSI flow:&#x20;
+
+1. **The SSI wallet**. Credentials will be stored in an SSI wallet. The wallet manages the cryptograpchic keys, interacts with issuers and verifiers and allows the user to decide which credentials are to be stored to shared.&#x20;
+2. **The Issuer**. Credentials are created by an issuer and provided to the Holder of the SSI wallet. Issuers converting data to verifiable credentials by building JSON data files following the SSI standards, in our case the W3C DID specification and signing the credentials with their private key.
+3. **The Verifier**. Credentials provided by an SSI wallet can be used for example to login into a web service. The web service verifies the credential and checks the claims, the signatures, and who issued the credentials. If all is ok, the web services grants access eventually.
+
+Lets assume you want to provide a credential for a user, e.g. to login into a web service. So, you are the **issuer** and you will create a login credential from a user's _Name_ and _Email Address._&#x20;
 
 ## Get your API keys
 
-Your API requests are authenticated using API keys. Any request that doesn't include an API key will return an error.
+Your API requests are authenticated using an API key. Any request that doesn't include an API key will return an error.
 
-You can generate an API key from your Dashboard at any time.
+You can generate an API key from your sideos administration console at any time. See [signing-up-to-sideos](signing-up-to-sideos/ "mention") for information how to get started and retrieve an API key.
 
-## Install the library
+## Get a credential ID
 
-The best way to interact with our API is to use one of our official libraries:
-
-{% tabs %}
-{% tab title="Node" %}
-```
-# Install via NPM
-npm install --save my-api
-```
-{% endtab %}
-
-{% tab title="Python" %}
-```
-# Install via pip
-pip install --upgrade myapi
-```
-{% endtab %}
-{% endtabs %}
-
-{% hint style="info" %}
-**Good to know:** Using tabs to separate out different languages is a great way to present technical examples or code documentation without cramming your docs with extra sections or pages per language.
-{% endhint %}
+You need a credential type that includes the Name and Email Address of the user. See section [creating-a-credential-type.md](signing-up-to-sideos/creating-a-credential-type.md "mention").&#x20;
 
 ## Make your first request
+
+Now you&#x20;
 
 To make your first request, send an authenticated request to the pets endpoint. This will create a `pet`, which is nice.
 

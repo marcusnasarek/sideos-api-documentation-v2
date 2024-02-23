@@ -1,8 +1,7 @@
 ---
 description: >-
   sideos provides SSI as a Service through a REST API that allows you to issue
-  and verify SSI credentials. This documentation will help you to get up to
-  speed with the API.
+  and verify SSI credentials.
 ---
 
 # Welcome!
@@ -18,11 +17,17 @@ That said, the general setup is therefore two-folded for 1) providing data and 2
 1. Issuance of a verifiable credential: an issuer provides the user with the verifiable credential which the user checks and stores on the user's device.&#x20;
 2. Verifying a credential: a verifier (so called relying party because it relies on the issuer's competence and the protection of the credential) to request and verify a credential
 
-The API is build around these 2 general flows. To access the API you need to retrieve an API Key. To get one [sign up with for an account with sideos](signing-up-to-sideos.md), there is a free trial account to get started.&#x20;
+<figure><img src=".gitbook/assets/figure Home 1.png" alt=""><figcaption><p>issuing and verifying credentials</p></figcaption></figure>
+
+The API is build around these 2 general flows. To access the API you need to retrieve an API Key. To get one sign up with for an account with sideos, there is a free trial account to get started:
+
+{% content-ref url="signing-up-to-sideos/" %}
+[signing-up-to-sideos](signing-up-to-sideos/)
+{% endcontent-ref %}
 
 ## Want to jump right in?
 
-Feeling like an eager beaver? Jump in to the quick start docs and get making your first request:
+With your brand new API Key you are ready to jump right in. Read the quick start doc and get your hands dirty:
 
 {% content-ref url="quick-start.md" %}
 [quick-start.md](quick-start.md)

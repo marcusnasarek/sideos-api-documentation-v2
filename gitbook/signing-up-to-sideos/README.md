@@ -8,7 +8,7 @@ description: Getting started with the sideos administration console
 
 The <mark style="color:purple;">**sideos administration console**</mark> is the management interface for **issuers** and **verifiers.** It is the place where you can manage the credentials you want to issue or verify, your company profile, and access to the sideos API for client applications.&#x20;
 
-<figure><img src=".gitbook/assets/Screen Shot 2024-02-23 at 12.36.19 PM.png" alt=""><figcaption><p>The sideos administration console</p></figcaption></figure>
+<figure><img src="../.gitbook/assets/Screen Shot 2024-02-23 at 12.36.19 PM.png" alt=""><figcaption><p>The sideos administration console</p></figcaption></figure>
 
 There is no username and password being used and you will login with SSI credentials, so the first thing you will require is the sideos wallet for iOS or Android Application which is called Sideos Transponder ([**android**](https://play.google.com/store/apps/details?id=com.sideosmobile) **|** [**iOS**](https://apps.apple.com/de/app/sideos-transponder/id1611001158?l=en)). Once the app is downloaded, the signup process can begin.&#x20;
 
@@ -27,7 +27,7 @@ Now you have access to the platform - what's next? The general workflow is the f
 
 ## Create an API Key
 
-<figure><img src=".gitbook/assets/Screen Shot 2024-02-23 at 12.51.33 PM.png" alt=""><figcaption><p>Example Company settings in the sideos administration console</p></figcaption></figure>
+<figure><img src="../.gitbook/assets/Screen Shot 2024-02-23 at 12.51.33 PM.png" alt=""><figcaption><p>Example Company settings in the sideos administration console</p></figcaption></figure>
 
 To get access to the sideos API and use the credential types you created in your account you need to create an **API key:**
 
@@ -42,13 +42,13 @@ Verifiable credentials issued with the sideos API contain the issuer name which 
 
 To begin with, you might want to add other admins who have full control over the platform. Your account is automatically the main admin, and with any paid plan, you can have an unlimited amount of admins. An **Admin** is a person within the organisation that has access to sideos administration console, can onboard other admins, create proofs and credentials, and have an overview of transactions.
 
-// HERE: section on how to onboard a new admin.
+See [add-an-admin.md](add-an-admin.md "mention") for a step by step description on how to add a new admin.
 
 ## Proof/Claims
 
 Next, you’ll want to set up proofs (also called claims). These are the data elements necessary to form Credentials. Their type and content are defined following the schema.org definitions. Essentially, this is the raw data format which defines what the credential represents. This can be the representation of an email, the data elements in a digital ID card, a specific date (e.g. date of birth), or whatever you can come up with - the possibilities are endless.&#x20;
 
-//HERE:  section on how to create a proof.&#x20;
+See [creating-a-credential-type.md](creating-a-credential-type.md "mention") for a step by step description on how to create a claim (proof) type.
 
 ## Credentials
 
@@ -57,6 +57,8 @@ After having created a proof (or multiple), you are now ready to create a creden
 A Credential (originally Verifiable Credential) is a certified data set that the identity holder owns and can be stored in a digital wallet. They can be issued from the organisations or self-signed by end-users, then exposed for verification.  Essentially, a credential is a bundle of proofs which are certified and locally stored on the identity holders digital wallet.&#x20;
 
 To create a credential, the corresponding proofs need to be set up already. However, if you realise you need more proofs than you currently have, you can create proofs parallel to the credentials.&#x20;
+
+See [creating-a-credential-type.md](creating-a-credential-type.md "mention")for a step by step description on how to create a credential type (template).
 
 ## Next Steps
 
