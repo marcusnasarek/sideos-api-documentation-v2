@@ -24,7 +24,7 @@ The steps are:
 
 Lets do this simple flow in an example below.&#x20;
 
-## Get your API keys
+## Get your API key
 
 Your API requests are authenticated using an API key. Any request that doesn't include an API key will return an error.
 
