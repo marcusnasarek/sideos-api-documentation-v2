@@ -2,9 +2,9 @@
 
 * [Welcome!](README.md)
 * [Quick Start](quick-start.md)
-* [Signing up to sideos](signing-up-to-sideos/README.md)
-  * [Creating a Credential Type](signing-up-to-sideos/creating-a-credential-type.md)
-  * [Add an Admin](signing-up-to-sideos/add-an-admin.md)
+* [Sign up & get started](sign-up-and-get-started/README.md)
+  * [Creating a Credential Type](sign-up-and-get-started/creating-a-credential-type.md)
+  * [Add an Admin](sign-up-and-get-started/add-an-admin.md)
 
 ## Reference
 

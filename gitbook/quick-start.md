@@ -28,11 +28,11 @@ Lets do this simple flow in an example below.&#x20;
 
 Your API requests are authenticated using an API key. Any request that doesn't include an API key will return an error.
 
-You can generate an API key from your sideos administration console at any time. See [signing-up-to-sideos](signing-up-to-sideos/ "mention") for information how to get started and retrieve an API key.
+You can generate an API key from your sideos administration console at any time. See [sign-up-and-get-started](sign-up-and-get-started/ "mention") for information how to get started and retrieve an API key.
 
 ## Get a credential ID
 
-You need a credential type that includes the Name and Email Address of the user. See section [creating-a-credential-type.md](signing-up-to-sideos/creating-a-credential-type.md "mention").&#x20;
+You need a credential type that includes the Name and Email Address of the user. See section [creating-a-credential-type.md](sign-up-and-get-started/creating-a-credential-type.md "mention").&#x20;
 
 ## Make your first request
 
