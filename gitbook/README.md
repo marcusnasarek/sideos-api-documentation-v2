@@ -19,7 +19,7 @@ That said, the general setup is therefore two-folded for 1) providing data and 2
 
 <figure><img src=".gitbook/assets/figure Home 1.png" alt=""><figcaption><p>issuing and verifying credentials</p></figcaption></figure>
 
-The API is build around these 2 general flows. To access the API you need to retrieve an API Key. To get one sign up with for an account with sideos, there is a free trial account to get started:
+The API is build around these 2 general flows. To access the API you need to retrieve an API Key. To get one, sign up for an account with sideos there is a free trial account to get started:
 
 {% content-ref url="signing-up-to-sideos/" %}
 [signing-up-to-sideos](signing-up-to-sideos/)
