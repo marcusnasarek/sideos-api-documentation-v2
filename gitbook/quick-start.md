@@ -8,7 +8,21 @@ There are 3 basic components in an SSI flow:&#x20;
 2. **The Issuer**. Credentials are created by an issuer and provided to the Holder of the SSI wallet. Issuers converting data to verifiable credentials by building JSON data files following the SSI standards, in our case the W3C DID specification and signing the credentials with their private key.
 3. **The Verifier**. Credentials provided by an SSI wallet can be used for example to login into a web service. The web service verifies the credential and checks the claims, the signatures, and who issued the credentials. If all is ok, the web services grants access eventually.
 
-Lets assume you want to provide a credential for a user, e.g. to login into a web service. So, you are the **issuer** and you will create a login credential from a user's _Name_ and _Email Address._&#x20;
+Lets assume you want to provide a user with a credential, e.g. to provide a login credential for a web service. In that example, you are the **issuer** and you will create a login credential from a user's _Name_ and _Email Address._&#x20;
+
+<figure><img src=".gitbook/assets/Basic Credential Offer.png" alt=""><figcaption><p>A basic credential issuance flow</p></figcaption></figure>
+
+The steps are:
+
+1. The web application (**Web Service**) calls the sideos API posting the dataset to the `/v3/createoffervc` endpoint. The dataset contains the credential ID, the claims, and a callback url.
+2. The **sideos API** responds with an credential offer provided as a JWT to the **Web Service**.
+3. The **Web Service** presents the JWT to the **SSI wallet**. That can be done as a QR Code, via NFC, or via Bluetooth.&#x20;
+4. The **SSI wallet** validates the credential offer and asks the user to accept the credential offer. If the user accepts the **SSI wallet** calls the callback url by posting the JWT back to the **Web Service**.
+5. The **Web Service** optionally checks the validity of the JWT with the **sideos API** calling the `/v3/consumeoffer` endpoint.  &#x20;
+6. The **sideos API** responds with the original JWT and an error code. The **Web Service** can now do the magic based on the credential acceptance status, e.g. by marking the status in some database or providing some conditional information on the web application.&#x20;
+7. The **Web Service** responds with the status 200 to the **SSI wallet** if the validation was successful.
+
+Lets do this simple flow in an example below.&#x20;
 
 ## Get your API keys
 
