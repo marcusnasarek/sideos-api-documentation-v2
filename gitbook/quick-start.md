@@ -22,40 +22,49 @@ You need a credential type that includes the Name and Email Address of the user.
 
 ## Make your first request
 
-Now you&#x20;
+Now when you have your API Key and a credential ID for your defined credential template, you can call the sideos API to get a credential offer for issuing a credential.&#x20;
 
-To make your first request, send an authenticated request to the pets endpoint. This will create a `pet`, which is nice.
+To make your first request, send an authenticated request to the pets endpoint. This will create a `credential offer`, which can be captured by the user and stored on the sideos wallet.
 
-{% swagger baseUrl="https://api.myapi.com/v1" method="post" path="/pet" summary="Create pet." %}
+## Create a credential Offer
+
+{% swagger baseUrl="https//juno.sideos.io/api/v3/createoffervc" method="post" path="/" summary="Create a credential offer." expanded="false" %}
 {% swagger-description %}
-Creates a new pet.
+Creates a credential offer based on the credential containing the claim data provided in the request.
 {% endswagger-description %}
 
-{% swagger-parameter in="body" name="name" required="true" type="string" %}
-The name of the pet
+{% swagger-parameter in="body" name="templateid" required="true" type="number" %}
+The `id` of the credential type
 {% endswagger-parameter %}
 
-{% swagger-parameter in="body" name="owner_id" required="false" type="string" %}
-The `id` of the user who owns the pet
+{% swagger-parameter in="body" name="dataset" required="true" type="object" %}
+The data set for the credential offer
 {% endswagger-parameter %}
 
-{% swagger-parameter in="body" name="species" required="false" type="string" %}
-The species of the pet
+{% swagger-parameter in="body" name="domain" required="true" type="string" %}
+The callback URL
 {% endswagger-parameter %}
 
-{% swagger-parameter in="body" name="breed" required="false" type="string" %}
-The breed of the pet
+{% swagger-parameter in="body" name="challenge" required="true" type="string" %}
+An unique identifier for the user session.
 {% endswagger-parameter %}
 
-{% swagger-response status="200" description="Pet successfully created" %}
-```javascript
+{% swagger-parameter in="header" name="Content Type" type="application/json" %}
+
+{% endswagger-parameter %}
+
+{% swagger-parameter in="header" name="X-Token" type="<API Key>" required="true" %}
+
+{% endswagger-parameter %}
+
+{% swagger-response status="200" description="credential offer successfully created" %}
+```json
 {
-    "name"="Wilson",
-    "owner": {
-        "id": "sha7891bikojbkreuy",
-        "name": "Samuel Passet",
-    "species": "Dog",}
-    "breed": "Golden Retriever",
+    "data": {
+        "error": 0,
+        "jwt": string,
+        "signid": [string],
+    }
 }
 ```
 {% endswagger-response %}
@@ -65,48 +74,39 @@ The breed of the pet
 {% endswagger-response %}
 {% endswagger %}
 
-{% hint style="info" %}
-**Good to know:** You can use the API Method block to fully document an API method. You can also sync your API blocks with an OpenAPI file or URL to auto-populate them.
-{% endhint %}
-
 Take a look at how you might call this method using our official libraries, or via `curl`:
 
 {% tabs %}
 {% tab title="curl" %}
 ```
-curl https://api.myapi.com/v1/pet  
-    -u YOUR_API_KEY:  
-    -d name='Wilson'  
-    -d species='dog'  
-    -d owner_id='sha7891bikojbkreuy'  
-```
-{% endtab %}
-
-{% tab title="Node" %}
-```javascript
-// require the myapi module and set it up with your API key
-const myapi = require('myapi')(YOUR_API_KEY);
-
-const newPet = away myapi.pet.create({
-    name: 'Wilson',
-    owner_id: 'sha7891bikojbkreuy',
-    species: 'Dog',
-    breed: 'Golden Retriever',
-})
-```
-{% endtab %}
-
-{% tab title="Python" %}
-```python
-// Set your API key before making the request
-myapi.api_key = YOUR_API_KEY
-
-myapi.Pet.create(
-    name='Wilson',
-    owner_id='sha7891bikojbkreuy',
-    species='Dog',
-    breed='Golden Retriever',
-)
+curl https://juno.sideos.io/v3/createoffervc/  
+    -H 'X-Token: <YOUR_API_KEY>'
+    -H 'Content-Type: application/json'  
+    -d '{"templateid":<YOUR_CREDENTIAL_ID>,"dataset":{"name":"Wilson Smith","email":"ws@example.com""},"challenge":"1234567890","domain":"https://callback.example.com"}' 
 ```
 {% endtab %}
 {% endtabs %}
+
+You will receive a response containing a data object with a jwt field.&#x20;
+
+{% code overflow="wrap" %}
+```json
+{
+    "data": {
+        "error":0,
+        "jwt":"eyJ0eXAiOiJKV1QiLCJhbGciOiJFZERTQSJ9.eyJAY29udGV4dCI6WyJodHRwczovL3d3dy53My5vcmcvMjAxOC9jcmVkZW50aWFscy92MSIsImh0dHBzOi8vanVuby5zaWRlb3MuaW8vY29udGV4dC9wcm9vZnN0eXBlcyJdLCJpYXQiOjE3MDg3MTc3NzUzOTEsImlzcyI6ImRpZDprZXk6djAwMTp6Nk1rbVFTWHZhOXZEbzNBU3JQRWtpa1AzSzF5eWlDVnZkNUttOHhqYkZqR2ROdzQiLCJhdWQiOiJkaWQ6dW5rbm93biIsInN1YiI6ImRpZDp1bmtub3duIiwiZXhwIjoxNzA4NzE3Nzc4OTkxLCJqdGkiOiJiMDMyZThlMy1iY2Q2LTQ0NWItYTQ5OS02ZWZjYzMwMTcyZjAiLCJ2ZXJpZmlhYmxlQ3JlZGVudGlhbCI6W3siQGNvbnRleHQiOlsiaHR0cHM6Ly93d3cudzMub3JnLzIwMTgvY3JlZGVudGlhbHMvdjEiLCJodHRwczovL3d3dy53My5vcmcvMjAxOC9jcmVkZW50aWFscy9leGFtcGxlcy92MSJdLCJpZCI6Ijg3N2JiYmVlLTJjYzUtNGJlZC04NzFmLWQ5ZGIwNjkzNjY1YiIsInR5cGUiOlsiVmVyaWZpYWJsZUNyZWRlbnRpYWwiLCJVc2VyIl0sImNyZWRlbnRpYWxTdWJqZWN0Ijp7Im5hbWUiOiJXaWxzb24gU21pdGgiLCJFbWFpbCI6IndzQGV4YW1wbGUuY29tIiwiaWQiOiJkaWQ6dW5rbm93biJ9LCJpc3N1ZXIiOnsiaWQiOiJkaWQ6a2V5OnYwMDE6ejZNa21RU1h2YTl2RG8zQVNyUEVraWtQM0sxeXlpQ1Z2ZDVLbTh4amJGakdkTnc0IiwibmFtZSI6Ik1OIHNpZGVvcyBUcnVzdCBTZXJ2aWNlcyJ9LCJpc3N1YW5jZURhdGUiOiIyMDI0LTAyLTIzVDE5OjQ5OjM1KzAwOjAwIiwiZXhwaXJhdGlvbkRhdGUiOiIyMDI1LTAyLTIyVDE5OjQ5OjM1KzAwOjAwIiwiZXhwIjoxNzQwMjUzNzc1MjI2LCJwcm9vZiI6eyJ0eXBlIjoiRWQyNTUxOVNpZ25hdHVyZTIwMjAiLCJjcmVhdGVkIjoiMjAyNC0wMi0yM1QxOTo0OTozNS4zMDlaIiwiandzIjoiZXlKMGVYQWlPaUpLVjFRaUxDSmhiR2NpT2lKRlpFUlRRU0o5Li43VUtkYXlaUmlhNlNFOW5BVXFQLTFtNER1OWtsUDY0Y2RYUnFWclRBYXlRcE5DUElqdDRGakxDTU5DUlRMOUNlU2V0UFI3VWtLSmJyeHl3UDF6SGZBdyIsInByb29mUHVycG9zZSI6ImFzc2VydGlvbk1ldGhvZCIsInZlcmlmaWNhdGlvbk1ldGhvZCI6ImRpZDprZXk6djAwMTp6Nk1rbVFTWHZhOXZEbzNBU3JQRWtpa1AzSzF5eWlDVnZkNUttOHhqYkZqR2ROdzQifX1dLCJwcm9vZiI6eyJjaGFsbGVuZ2UiOiIxMjM0NTY3ODkwIiwidmVyaWZpY2F0aW9uTWV0aG9kIjoiZGlkOmtleTp2MDAxOno2TWttUVNYdmE5dkRvM0FTclBFa2lrUDNLMXl5aUNWdmQ1S204eGpiRmpHZE53NCIsImNyZWF0ZWQiOiIyMDI0LTAyLTIzVDE5OjQ5OjM1KzAwOjAwIiwiZG9tYWluIjoiaHR0cHM6Ly9jYWxsYmFjay5leGFtcGxlLmNvbSIsImp3cyI6IjI5a2J5T3pTcDRreEU2MnRWQ2pzVWZ4NEFIM0RaLUw1Ql9RVEJyc1BsdFViOE5QZXRteU5GWUlhWEVFdGdma3UwVXgweWFLU3VObDVBQUl1TW5fY0JBIiwicHJvb2ZQdXJwb3NlIjoiYXV0aGVudGljYXRpb24iLCJ0eXBlIjoiRVMyNTYifSwidHlwZSI6WyJWZXJpZmlhYmxlUHJlc2VudGF0aW9uIiwiQ3JlZGVudGlhbE9mZmVyIl19.2mxmsQ10dGKHbqTrJEQci5MDiTOPFGZHrHKCtS2R5qruNBEGtdxaGVSVy4iJmXlTf3JS7L7AzE2aTA5laAFLCA",
+        "signid":["877bbbee-2cc5-4bed-871f-d9db0693665b"]
+    }
+}
+```
+{% endcode %}
+
+The string is a base64 encoded JWT that can be read by the sideos wallet, e.g. as a QR Code and shown to the user like this:
+
+<img src=".gitbook/assets/Iphone 14 - 1 (1).png" alt="" data-size="original">&#x20;
+
+The wallet asks the user to accept or decline the offer. If the user accepts the offer, the credential is stored on the phone and the callback URL from the `domain` field in the credential offer is called to complete the credential acceptance.&#x20;
+
+{% hint style="info" %}
+The callback URL needs to respond with a 200 status in order to successfully store the credential. If an error code comes back the wallet shown an error screen and does not store the credential in the wallet.&#x20;
+{% endhint %}
