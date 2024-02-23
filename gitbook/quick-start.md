@@ -4,7 +4,7 @@
 
 There are 3 basic components in an SSI flow:&#x20;
 
-1. **The SSI wallet**. Credentials will be stored in an SSI wallet. The wallet manages the cryptograpchic keys, interacts with issuers and verifiers and allows the user to decide which credentials are to be stored to shared.&#x20;
+1. **The SSI wallet**. Credentials will be stored in an SSI wallet. The wallet manages the cryptographic keys, interacts with issuers and verifiers and allows the user to decide which credentials are to be stored to shared.&#x20;
 2. **The Issuer**. Credentials are created by an issuer and provided to the Holder of the SSI wallet. Issuers converting data to verifiable credentials by building JSON data files following the SSI standards, in our case the W3C DID specification and signing the credentials with their private key.
 3. **The Verifier**. Credentials provided by an SSI wallet can be used for example to login into a web service. The web service verifies the credential and checks the claims, the signatures, and who issued the credentials. If all is ok, the web services grants access eventually.
 
@@ -115,7 +115,7 @@ You will receive a response containing a data object with a jwt field.&#x20;
 ```
 {% endcode %}
 
-The string is a base64 encoded JWT that can be read by the sideos wallet, e.g. as a QR Code and shown to the user like this:
+The string is a base64 encoded JWT. Check the jwt string with a JWT parser, e.g. [https://jwt.io](https://jwt.io) to see the content. The JWT can be read by the **sideos wallet**, e.g. as a QR Code and shown to the user like this:
 
 <img src=".gitbook/assets/Iphone 14 - 1 (1).png" alt="" data-size="original">&#x20;
 

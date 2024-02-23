@@ -2,7 +2,7 @@
 description: Getting started with the sideos administration console
 ---
 
-# Signing up to sideos
+# Sign up & get started
 
 ## Introduction
 
@@ -20,7 +20,7 @@ Once you scanned the QR Code, you will be redirected to the Juno web app. Next t
 
 Now you have access to the platform - what's next? The general workflow is the following:&#x20;
 
-1. Create an API access token, this will go into your client application's configuration as an API Key in the the request header as \`X-Token\`
+1. Create an API access token, this will go into your client application's configuration as an API Key in the the request header as `X-Token`
 2. Define the credential in 2 steps: a) create claim types, e.g. a name and an email address, and b) create an credential type containing the claim types.
 3. Note down the credential ID, this will be used in your client application to refer to the ID in calls of the API.
 4. Use the API Key for authorised calls of the API endpoints, and the credential IDs to refer to credential types when you request or offer a verifiable credential.&#x20;
@@ -31,9 +31,9 @@ Now you have access to the platform - what's next? The general workflow is the f
 
 To get access to the sideos API and use the credential types you created in your account you need to create an **API key:**
 
-1. Go to _Settings_ > _Company Settings\_._&#x20;
+1. Go to _Settings_ > _Company Settings._&#x20;
 2. Click on _Create token_
-3. Note down the **token** as this is the API Key that goes in your client application's request header as \`X-Token\`.&#x20;
+3. Note down the **token** as this is the API Key that goes in your client application's request header as `X-Token`.&#x20;
 4. Note also down the **Company DID** as you may use the DID for validating credentials based on the issuer identification.&#x20;
 
 Verifiable credentials issued with the sideos API contain the issuer name which is the **Company Name** in the settings, and the issuer DID which is the **Company DID** in the settings.&#x20;
