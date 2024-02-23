@@ -2,6 +2,7 @@
 
 * [Welcome!](README.md)
 * [Quick Start](quick-start.md)
+* [Signing up to sideos](signing-up-to-sideos.md)
 
 ## Reference
 
