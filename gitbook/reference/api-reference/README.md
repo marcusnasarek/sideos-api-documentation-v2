@@ -1,5 +1,5 @@
 ---
-description: WORK IN PROGRESS [50%]
+description: The sideos API reference
 ---
 
 # API Reference
