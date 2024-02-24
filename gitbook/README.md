@@ -2,6 +2,22 @@
 description: >-
   sideos provides SSI as a Service through a REST API that allows you to issue
   and verify SSI credentials.
+cover: .gitbook/assets/heroBG_aligned_center.png
+coverY: 0
+layout:
+  cover:
+    visible: true
+    size: full
+  title:
+    visible: true
+  description:
+    visible: true
+  tableOfContents:
+    visible: true
+  outline:
+    visible: true
+  pagination:
+    visible: true
 ---
 
 # Welcome!
