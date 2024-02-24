@@ -8,4 +8,8 @@
 
 ## Reference
 
-* [API Reference](reference/api-reference.md)
+* [API Reference](reference/api-reference/README.md)
+  * [Offer Credentials](reference/api-reference/offer-credentials.md)
+  * [Request Credentials](reference/api-reference/request-credentials.md)
+  * [Templates](reference/api-reference/templates.md)
+* [Page](reference/page.md)

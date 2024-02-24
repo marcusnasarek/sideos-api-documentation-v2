@@ -8,7 +8,9 @@ There are 3 basic components in an SSI flow:&#x20;
 2. **The Issuer**. Credentials are created by an issuer and provided to the Holder of the SSI wallet. Issuers converting data to verifiable credentials by building JSON data files following the SSI standards, in our case the W3C DID specification and signing the credentials with their private key.
 3. **The Verifier**. Credentials provided by an SSI wallet can be used for example to login into a web service. The web service verifies the credential and checks the claims, the signatures, and who issued the credentials. If all is ok, the web services grants access eventually.
 
-Lets assume you want to provide a user with a credential, e.g. to provide a login credential for a web service. In that example, you are the **issuer** and you will create a login credential from a user's _Name_ and _Email Address._&#x20;
+sideos helps Issuers and Verifiers to use the SSI protocol with very little effort. The API is called to wrap data into SSI protocol and allow for example a Web Service to interact with SSI wallets.&#x20;
+
+Lets assume you want to provide a user with a credential, e.g. to provide a login credential for a web service. In that example, the **Web Service** is the **issuer** and will create a login credential from a user's _Name_ and _Email Address_ with the help of the **sideos API.** The Web Service will then offer the credential to the **SSI Wallet** that stores the credential securely for the later use as a Login credential.
 
 <figure><img src=".gitbook/assets/Basic Credential Offer.png" alt=""><figcaption><p>A basic credential issuance flow</p></figcaption></figure>
 
@@ -88,15 +90,44 @@ An unique identifier for the user session.
 {% endswagger-response %}
 {% endswagger %}
 
-Take a look at how you might call this method using our official libraries, or via `curl`:
+Take a look at how you might call this method using `Typescript code`, or via `curl`:
 
 {% tabs %}
 {% tab title="curl" %}
+{% code overflow="wrap" %}
 ```
 curl https://juno.sideos.io/v3/createoffervc/  
     -H 'X-Token: <YOUR_API_KEY>'
     -H 'Content-Type: application/json'  
-    -d '{"templateid":<YOUR_CREDENTIAL_ID>,"dataset":{"name":"Wilson Smith","email":"ws@example.com""},"challenge":"1234567890","domain":"https://callback.example.com"}' 
+    -d '{"templateid":<YOUR_CREDENTIAL_ID>,
+    "dataset":{"name":"Wilson Smith","email":"ws@example.com"},
+    "challenge":"1234567890",
+    "domain":"https://callback.example.com"}' 
+```
+{% endcode %}
+{% endtab %}
+
+{% tab title="Typescript" %}
+```typescript
+let data = { 
+   headers: {
+      "X-Token": "<YOUR API KEY>",
+      "Content-Type": "application/json"
+   },
+   body: {
+      "templateid": <YOUR TEMPLATE ID>,
+      "domain": "<URL ENDPOINT OF YOUR CALLBACK",
+      "challenge": "<YOUR UNIQUE CHALLENGE TO IDENTIFY THIS CALL",
+      "dataset": {
+         "name": "Wilson Smith",
+         "email":"ws@example.com"
+      }
+   }
+}
+
+let response = client.post("https://juno.sideos.io/v3/createoffervc", data)
+
+// If everything is correct "response" should contain the JWT signed by your account DID wallet, ready to be displayed as a QRCode 
 ```
 {% endtab %}
 {% endtabs %}

@@ -1,0 +1,520 @@
+openapi: 3.0.0
+info:
+  title: sideos API
+  description: Optional multiline or single-line description in [CommonMark](http://commonmark.org/help/) or HTML.
+  version: 1.0.1
+  license: 
+    name: sideos
+    url: https://www.sideos.io/terms-conditions
+servers:
+  - url: https://juno.sideos.io/v3
+    description: production server
+  - url: https://staging.sideos.io
+    description: Internal staging server for testing
+tags: 
+  - name: "Offer"
+    description: "Creating offers for Verifiable Credentials"
+  - name: "Request"
+    description: "Creating requests for Verifiable Credentials"
+  - name: "Templates"
+    description: "Managing Credential Type templates"
+paths:
+  /createoffervc:
+    post:
+      tags: 
+        -  "Offer"
+      security: 
+        -  ApiKeyAuth: []
+      operationId: createOfferVc
+      summary: Create a verifiable credential.
+      description: Request to create a verifiable credential based on the claim data records provided.
+      requestBody:
+        description: Provide the data set containing the claims for the credential
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                templateid:
+                  type: number
+                  format: integer
+                  example: 57
+                  description: "the template id refers to the credential type created in the administration console."
+                challenge:
+                  type: string
+                  format: string
+                  example: "634F5950-DA17-4441-ABEC-9765FF1D55C0"
+                  description: "unique id for the server to identify the session/request."
+                domain:
+                  type: string
+                  format: url
+                  example: "https://issuer.example.com/consumeoffer"
+                  description: "the callback url where the wallet sends the accepted credential to. Needs to respond with 200 to make the wallet storing the credential."
+                dataset:
+                  type: object
+                  example: '{ "name": "Will Smith", "email": "ws@example.com" }'
+                  description: "object contains the claims that should be put in the credential. Need to match the template referred to with the 'templateid' field."
+      responses:
+        '200':    # status code
+          description: Response is a Verifiable Credential provded as a base64-encoded JWT.
+          content:
+            application/json:
+              schema: 
+                type: object
+                properties: 
+                  data:
+                    $ref: "#/components/schemas/OfferVC"
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error400"
+        '403':
+          description: Unauthorized Access
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error403"
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error500"
+  /consumeoffer:
+    post:
+      tags: 
+        -  "Offer"
+      security: 
+        -  ApiKeyAuth: []
+      operationId: consumeOffer
+      summary: validates verifiable credential offer.
+      description: Request to validate a verifiable credential offer based on the respective credential type.
+      requestBody:
+        description: Provide the verifiable credential and the credential type
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                templateid:
+                  type: number
+                  format: integer
+                  example: 57
+                  description: "the template id refers to the credential type created in the administration console."
+                token:
+                  type: string
+                  format: base64
+                  example: "eyJ0eXAiOiJKV1QiLCJhbGciOiJFZERTQSJ9.eyJAY29udGV4dCI6WyJodHRwczovL3d3dy53My5vcmcvMjAxOC9jcmVkZW50aWFscy92MSIsImh0dHBzOi8vanVuby5zaWRlb3MuaW8vY29udGV4dC9wcm9vZnN0eXBlcyJdLCJpYXQiOjE3MDg3MTc3NzUzOTEsImlzcyI6ImRpZDprZXk6djAwMTp6Nk1rbVFTWHZhOXZEbzNBU3JQRWtpa1AzSzF5eWlDVnZkNUttOHhqYkZqR2ROdzQiLCJhdWQiOiJkaWQ6dW5rbm93biIsInN1YiI6ImRpZDp1bmtub3duIiwiZXhwIjoxNzA4NzE3Nzc4OTkxLCJqdGkiOiJiMDMyZThlMy1iY2Q2LTQ0NWItYTQ5OS02ZWZjYzMwMTcyZjAiLCJ2ZXJpZmlhYmxlQ3JlZGVudGlhbCI6W3siQGNvbnRleHQiOlsiaHR0cHM6Ly93d3cudzMub3JnLzIwMTgvY3JlZGVudGlhbHMvdjEiLCJodHRwczovL3d3dy53My5vcmcvMjAxOC9jcmVkZW50aWFscy9leGFtcGxlcy92MSJdLCJpZCI6Ijg3N2JiYmVlLTJjYzUtNGJlZC04NzFmLWQ5ZGIwNjkzNjY1YiIsInR5cGUiOlsiVmVyaWZpYWJsZUNyZWRlbnRpYWwiLCJVc2VyIl0sImNyZWRlbnRpYWxTdWJqZWN0Ijp7Im5hbWUiOiJXaWxzb24gU21pdGgiLCJFbWFpbCI6IndzQGV4YW1wbGUuY29tIiwiaWQiOiJkaWQ6dW5rbm93biJ9LCJpc3N1ZXIiOnsiaWQiOiJkaWQ6a2V5OnYwMDE6ejZNa21RU1h2YTl2RG8zQVNyUEVraWtQM0sxeXlpQ1Z2ZDVLbTh4amJGakdkTnc0IiwibmFtZSI6Ik1OIHNpZGVvcyBUcnVzdCBTZXJ2aWNlcyJ9LCJpc3N1YW5jZURhdGUiOiIyMDI0LTAyLTIzVDE5OjQ5OjM1KzAwOjAwIiwiZXhwaXJhdGlvbkRhdGUiOiIyMDI1LTAyLTIyVDE5OjQ5OjM1KzAwOjAwIiwiZXhwIjoxNzQwMjUzNzc1MjI2LCJwcm9vZiI6eyJ0eXBlIjoiRWQyNTUxOVNpZ25hdHVyZTIwMjAiLCJjcmVhdGVkIjoiMjAyNC0wMi0yM1QxOTo0OTozNS4zMDlaIiwiandzIjoiZXlKMGVYQWlPaUpLVjFRaUxDSmhiR2NpT2lKRlpFUlRRU0o5Li43VUtkYXlaUmlhNlNFOW5BVXFQLTFtNER1OWtsUDY0Y2RYUnFWclRBYXlRcE5DUElqdDRGakxDTU5DUlRMOUNlU2V0UFI3VWtLSmJyeHl3UDF6SGZBdyIsInByb29mUHVycG9zZSI6ImFzc2VydGlvbk1ldGhvZCIsInZlcmlmaWNhdGlvbk1ldGhvZCI6ImRpZDprZXk6djAwMTp6Nk1rbVFTWHZhOXZEbzNBU3JQRWtpa1AzSzF5eWlDVnZkNUttOHhqYkZqR2ROdzQifX1dLCJwcm9vZiI6eyJjaGFsbGVuZ2UiOiIxMjM0NTY3ODkwIiwidmVyaWZpY2F0aW9uTWV0aG9kIjoiZGlkOmtleTp2MDAxOno2TWttUVNYdmE5dkRvM0FTclBFa2lrUDNLMXl5aUNWdmQ1S204eGpiRmpHZE53NCIsImNyZWF0ZWQiOiIyMDI0LTAyLTIzVDE5OjQ5OjM1KzAwOjAwIiwiZG9tYWluIjoiaHR0cHM6Ly9jYWxsYmFjay5leGFtcGxlLmNvbSIsImp3cyI6IjI5a2J5T3pTcDRreEU2MnRWQ2pzVWZ4NEFIM0RaLUw1Ql9RVEJyc1BsdFViOE5QZXRteU5GWUlhWEVFdGdma3UwVXgweWFLU3VObDVBQUl1TW5fY0JBIiwicHJvb2ZQdXJwb3NlIjoiYXV0aGVudGljYXRpb24iLCJ0eXBlIjoiRVMyNTYifSwidHlwZSI6WyJWZXJpZmlhYmxlUHJlc2VudGF0aW9uIiwiQ3JlZGVudGlhbE9mZmVyIl19.2mxmsQ10dGKHbqTrJEQci5MDiTOPFGZHrHKCtS2R5qruNBEGtdxaGVSVy4iJmXlTf3JS7L7AzE2aTA5laAFLCA634F5950-DA17-4441-ABEC-9765FF1D55C0"
+                  description: "base64-encoded JWT"
+      responses:
+        '200':    # status code
+          description: Response is a Verifiable Credential provded as a base64-encoded JWT. No error implies sucessful validation
+          content:
+            application/json:
+              schema: 
+                $ref: "#/components/schemas/OfferVC"
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error400"
+        '403':
+          description: Unauthorized Access
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error403"
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error500"
+  /createrequestvc:
+    post:
+      tags: 
+        -  "Request"
+      security: 
+        -  ApiKeyAuth: []
+      operationId: createRequestVc
+      summary: Request a verifiable credential.
+      description: Request a verifiable credential based on the credential type provided.
+      requestBody:
+        description: Provide the credential type referring to the credential type for a certain set of claims
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                templateid:
+                  type: number
+                  format: integer
+                  example: 57
+                  description: "the template id refers to the credential type created in the administration console."
+                challenge:
+                  type: string
+                  format: string
+                  example: "634F5950-DA17-4441-ABEC-9765FF1D55C0"
+                  description: "unique id for the server to identify the session/request."
+                domain:
+                  type: string
+                  format: url
+                  example: "https://issuer.example.com/consumeoffer"
+                  description: "the callback url where the wallet sends the accepted credential to. Needs to respond with 200 to make the wallet storing the credential."
+      responses:
+        '200':    # status code
+          description: Response is a Verifiable Credential provded as a base64-encoded JWT.
+          content:
+            application/json:
+              schema: 
+                $ref: "#/components/schemas/RequestVC"
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error400"
+        '403':
+          description: Unauthorized Access
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error403"
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error500"
+  /consumerequest:
+    post:
+      tags: 
+        -  "Request"
+      security: 
+        -  ApiKeyAuth: []
+      operationId: ConsumeRequest
+      summary: Consume a verifiable credential request.
+      description: Consume a verifiable credential request based on the credential type provided.
+      requestBody:
+        description: Provide the credential type referring to the credential type for a certain set of claims
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                templateid:
+                  type: number
+                  format: integer
+                  example: 57
+                  description: "the template id refers to the credential type created in the administration console."
+                jwt: 
+                  type: string
+                  format: base64
+                  example: "eyJ0eXAiOiJKV1QiLCJhbGciOiJFZERTQSJ9.eyJAY29udGV4dCI6WyJodHRwczovL3d3dy53My5vcmcvMjAxOC9jcmVkZW50aWFscy92MSIsImh0dHBzOi8vanVuby5zaWRlb3MuaW8vY29udGV4dC9wcm9vZnN0eXBlcyJdLCJpYXQiOjE3MDg3MTc3NzUzOTEsImlzcyI6ImRpZDprZXk6djAwMTp6Nk1rbVFTWHZhOXZEbzNBU3JQRWtpa1AzSzF5eWlDVnZkNUttOHhqYkZqR2ROdzQiLCJhdWQiOiJkaWQ6dW5rbm93biIsInN1YiI6ImRpZDp1bmtub3duIiwiZXhwIjoxNzA4NzE3Nzc4OTkxLCJqdGkiOiJiMDMyZThlMy1iY2Q2LTQ0NWItYTQ5OS02ZWZjYzMwMTcyZjAiLCJ2ZXJpZmlhYmxlQ3JlZGVudGlhbCI6W3siQGNvbnRleHQiOlsiaHR0cHM6Ly93d3cudzMub3JnLzIwMTgvY3JlZGVudGlhbHMvdjEiLCJodHRwczovL3d3dy53My5vcmcvMjAxOC9jcmVkZW50aWFscy9leGFtcGxlcy92MSJdLCJpZCI6Ijg3N2JiYmVlLTJjYzUtNGJlZC04NzFmLWQ5ZGIwNjkzNjY1YiIsInR5cGUiOlsiVmVyaWZpYWJsZUNyZWRlbnRpYWwiLCJVc2VyIl0sImNyZWRlbnRpYWxTdWJqZWN0Ijp7Im5hbWUiOiJXaWxzb24gU21pdGgiLCJFbWFpbCI6IndzQGV4YW1wbGUuY29tIiwiaWQiOiJkaWQ6dW5rbm93biJ9LCJpc3N1ZXIiOnsiaWQiOiJkaWQ6a2V5OnYwMDE6ejZNa21RU1h2YTl2RG8zQVNyUEVraWtQM0sxeXlpQ1Z2ZDVLbTh4amJGakdkTnc0IiwibmFtZSI6Ik1OIHNpZGVvcyBUcnVzdCBTZXJ2aWNlcyJ9LCJpc3N1YW5jZURhdGUiOiIyMDI0LTAyLTIzVDE5OjQ5OjM1KzAwOjAwIiwiZXhwaXJhdGlvbkRhdGUiOiIyMDI1LTAyLTIyVDE5OjQ5OjM1KzAwOjAwIiwiZXhwIjoxNzQwMjUzNzc1MjI2LCJwcm9vZiI6eyJ0eXBlIjoiRWQyNTUxOVNpZ25hdHVyZTIwMjAiLCJjcmVhdGVkIjoiMjAyNC0wMi0yM1QxOTo0OTozNS4zMDlaIiwiandzIjoiZXlKMGVYQWlPaUpLVjFRaUxDSmhiR2NpT2lKRlpFUlRRU0o5Li43VUtkYXlaUmlhNlNFOW5BVXFQLTFtNER1OWtsUDY0Y2RYUnFWclRBYXlRcE5DUElqdDRGakxDTU5DUlRMOUNlU2V0UFI3VWtLSmJyeHl3UDF6SGZBdyIsInByb29mUHVycG9zZSI6ImFzc2VydGlvbk1ldGhvZCIsInZlcmlmaWNhdGlvbk1ldGhvZCI6ImRpZDprZXk6djAwMTp6Nk1rbVFTWHZhOXZEbzNBU3JQRWtpa1AzSzF5eWlDVnZkNUttOHhqYkZqR2ROdzQifX1dLCJwcm9vZiI6eyJjaGFsbGVuZ2UiOiIxMjM0NTY3ODkwIiwidmVyaWZpY2F0aW9uTWV0aG9kIjoiZGlkOmtleTp2MDAxOno2TWttUVNYdmE5dkRvM0FTclBFa2lrUDNLMXl5aUNWdmQ1S204eGpiRmpHZE53NCIsImNyZWF0ZWQiOiIyMDI0LTAyLTIzVDE5OjQ5OjM1KzAwOjAwIiwiZG9tYWluIjoiaHR0cHM6Ly9jYWxsYmFjay5leGFtcGxlLmNvbSIsImp3cyI6IjI5a2J5T3pTcDRreEU2MnRWQ2pzVWZ4NEFIM0RaLUw1Ql9RVEJyc1BsdFViOE5QZXRteU5GWUlhWEVFdGdma3UwVXgweWFLU3VObDVBQUl1TW5fY0JBIiwicHJvb2ZQdXJwb3NlIjoiYXV0aGVudGljYXRpb24iLCJ0eXBlIjoiRVMyNTYifSwidHlwZSI6WyJWZXJpZmlhYmxlUHJlc2VudGF0aW9uIiwiQ3JlZGVudGlhbE9mZmVyIl19.2mxmsQ10dGKHbqTrJEQci5MDiTOPFGZHrHKCtS2R5qruNBEGtdxaGVSVy4iJmXlTf3JS7L7AzE2aTA5laAFLCA"
+      responses:
+        '200':   
+          description: Response is a Verifiable Credential provded as a base64-encoded JWT.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: 
+                  data:
+                    type: object
+                    properties: 
+                      error:
+                        type: number
+                        format: integer
+                        example: 0
+                      payload:
+                        $ref: "#/components/schemas/VerifiablePresentation"
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error400"
+        '403':
+          description: Unauthorized Access
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error403"
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error500"
+  /templatefielddescription:
+    post: 
+      tags: 
+        -  "Templates"
+      security: 
+        -  ApiKeyAuth: []
+      operationId: templateFieldDescription
+      summary: Description of the template fields.
+      description: Provide the types of the fields of a template based on the given template ID.
+      requestBody: 
+        description: Provide the template ID to get the template fields description 
+        required: true
+        content: 
+          application/json:
+            schema: 
+              type: object
+              properties: 
+                TemplateId:
+                  type: number
+                  format: integer
+                  example: 18
+                  description: The ID of a credential template as defined in the sidoes administration console.
+      responses: 
+        '200':   
+          description: The description of the template definition.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TemplateDef"
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error400"
+        '403':
+          description: Unauthorized Access
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error403"
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error500"
+  /createsignedvc:
+    post: 
+      tags: 
+        -  "Offer"
+      security: 
+        -  ApiKeyAuth: []
+      operationId: createSignedVc
+      summary: Create a signed VC Offer
+      description: Based on the dataset provided and the audience identifier a Veriable Credential is created.
+      requestBody: 
+        content:
+          application/json:
+            schema: 
+              type: object
+              properties:
+                aud:
+                  type: string
+                  format: did
+                  example: did:key:v004:z6MkrL41Eo41aHPhrdEAatCqYc7TiU3PHso5fLyNE7sfbkfQ
+                  description: The identifier if the receiving audience or subject of the Verifiable Credential
+                templateid:
+                  type: number
+                  format: integer
+                  example: 18
+                  description: "the template id refers to the credential type created in the administration console."
+                dataset:
+                  type: object
+                  example: '{"email":"rve@example.com","name":"Rheik van Eyck"}'
+                  description: "object contains the claims that should be put in the credential. Need to match the template referred to with the 'templateid' field."
+      responses: 
+        '200':   
+          description: The signed Veriable Credential including the audience identifier.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OfferVC"
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error400"
+        '403':
+          description: Unauthorized Access
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error403"
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error500"      
+components:
+  schemas:
+    OfferVC:
+      type: object
+      properties: 
+        error:
+          type: number
+          format: integer
+          example: 0
+        jwt:
+          type: string
+          format: base64
+          example: "eyJ0eXAiOiJKV1QiLCJhbGciOiJFZERTQSJ9.eyJAY29udGV4dCI6WyJodHRwczovL3d3dy53My5vcmcvMjAxOC9jcmVkZW50aWFscy92MSIsImh0dHBzOi8vanVuby5zaWRlb3MuaW8vY29udGV4dC9wcm9vZnN0eXBlcyJdLCJpYXQiOjE3MDg3MTc3NzUzOTEsImlzcyI6ImRpZDprZXk6djAwMTp6Nk1rbVFTWHZhOXZEbzNBU3JQRWtpa1AzSzF5eWlDVnZkNUttOHhqYkZqR2ROdzQiLCJhdWQiOiJkaWQ6dW5rbm93biIsInN1YiI6ImRpZDp1bmtub3duIiwiZXhwIjoxNzA4NzE3Nzc4OTkxLCJqdGkiOiJiMDMyZThlMy1iY2Q2LTQ0NWItYTQ5OS02ZWZjYzMwMTcyZjAiLCJ2ZXJpZmlhYmxlQ3JlZGVudGlhbCI6W3siQGNvbnRleHQiOlsiaHR0cHM6Ly93d3cudzMub3JnLzIwMTgvY3JlZGVudGlhbHMvdjEiLCJodHRwczovL3d3dy53My5vcmcvMjAxOC9jcmVkZW50aWFscy9leGFtcGxlcy92MSJdLCJpZCI6Ijg3N2JiYmVlLTJjYzUtNGJlZC04NzFmLWQ5ZGIwNjkzNjY1YiIsInR5cGUiOlsiVmVyaWZpYWJsZUNyZWRlbnRpYWwiLCJVc2VyIl0sImNyZWRlbnRpYWxTdWJqZWN0Ijp7Im5hbWUiOiJXaWxzb24gU21pdGgiLCJFbWFpbCI6IndzQGV4YW1wbGUuY29tIiwiaWQiOiJkaWQ6dW5rbm93biJ9LCJpc3N1ZXIiOnsiaWQiOiJkaWQ6a2V5OnYwMDE6ejZNa21RU1h2YTl2RG8zQVNyUEVraWtQM0sxeXlpQ1Z2ZDVLbTh4amJGakdkTnc0IiwibmFtZSI6Ik1OIHNpZGVvcyBUcnVzdCBTZXJ2aWNlcyJ9LCJpc3N1YW5jZURhdGUiOiIyMDI0LTAyLTIzVDE5OjQ5OjM1KzAwOjAwIiwiZXhwaXJhdGlvbkRhdGUiOiIyMDI1LTAyLTIyVDE5OjQ5OjM1KzAwOjAwIiwiZXhwIjoxNzQwMjUzNzc1MjI2LCJwcm9vZiI6eyJ0eXBlIjoiRWQyNTUxOVNpZ25hdHVyZTIwMjAiLCJjcmVhdGVkIjoiMjAyNC0wMi0yM1QxOTo0OTozNS4zMDlaIiwiandzIjoiZXlKMGVYQWlPaUpLVjFRaUxDSmhiR2NpT2lKRlpFUlRRU0o5Li43VUtkYXlaUmlhNlNFOW5BVXFQLTFtNER1OWtsUDY0Y2RYUnFWclRBYXlRcE5DUElqdDRGakxDTU5DUlRMOUNlU2V0UFI3VWtLSmJyeHl3UDF6SGZBdyIsInByb29mUHVycG9zZSI6ImFzc2VydGlvbk1ldGhvZCIsInZlcmlmaWNhdGlvbk1ldGhvZCI6ImRpZDprZXk6djAwMTp6Nk1rbVFTWHZhOXZEbzNBU3JQRWtpa1AzSzF5eWlDVnZkNUttOHhqYkZqR2ROdzQifX1dLCJwcm9vZiI6eyJjaGFsbGVuZ2UiOiIxMjM0NTY3ODkwIiwidmVyaWZpY2F0aW9uTWV0aG9kIjoiZGlkOmtleTp2MDAxOno2TWttUVNYdmE5dkRvM0FTclBFa2lrUDNLMXl5aUNWdmQ1S204eGpiRmpHZE53NCIsImNyZWF0ZWQiOiIyMDI0LTAyLTIzVDE5OjQ5OjM1KzAwOjAwIiwiZG9tYWluIjoiaHR0cHM6Ly9jYWxsYmFjay5leGFtcGxlLmNvbSIsImp3cyI6IjI5a2J5T3pTcDRreEU2MnRWQ2pzVWZ4NEFIM0RaLUw1Ql9RVEJyc1BsdFViOE5QZXRteU5GWUlhWEVFdGdma3UwVXgweWFLU3VObDVBQUl1TW5fY0JBIiwicHJvb2ZQdXJwb3NlIjoiYXV0aGVudGljYXRpb24iLCJ0eXBlIjoiRVMyNTYifSwidHlwZSI6WyJWZXJpZmlhYmxlUHJlc2VudGF0aW9uIiwiQ3JlZGVudGlhbE9mZmVyIl19.2mxmsQ10dGKHbqTrJEQci5MDiTOPFGZHrHKCtS2R5qruNBEGtdxaGVSVy4iJmXlTf3JS7L7AzE2aTA5laAFLCA"
+        signid:
+          type: array
+          items:
+            type: string
+            format: uuid
+            example: "877bbbee-2cc5-4bed-871f-d9db0693665b"
+    RequestVC:
+      type: object
+      properties: 
+        error:
+          type: number
+          format: integer
+          example: 0
+        jwt:
+          type: string
+          format: base64
+          example: "eyJ0eXAiOiJKV1QiLCJhbGciOiJFZERTQSJ9.eyJAY29udGV4dCI6WyJodHRwczovL3d3dy53My5vcmcvMjAxOC9jcmVkZW50aWFscy92MSIsImh0dHBzOi8vanVuby5zaWRlb3MuaW8vY29udGV4dC9wcm9vZnN0eXBlcyJdLCJpYXQiOjE3MDg3MTc3NzUzOTEsImlzcyI6ImRpZDprZXk6djAwMTp6Nk1rbVFTWHZhOXZEbzNBU3JQRWtpa1AzSzF5eWlDVnZkNUttOHhqYkZqR2ROdzQiLCJhdWQiOiJkaWQ6dW5rbm93biIsInN1YiI6ImRpZDp1bmtub3duIiwiZXhwIjoxNzA4NzE3Nzc4OTkxLCJqdGkiOiJiMDMyZThlMy1iY2Q2LTQ0NWItYTQ5OS02ZWZjYzMwMTcyZjAiLCJ2ZXJpZmlhYmxlQ3JlZGVudGlhbCI6W3siQGNvbnRleHQiOlsiaHR0cHM6Ly93d3cudzMub3JnLzIwMTgvY3JlZGVudGlhbHMvdjEiLCJodHRwczovL3d3dy53My5vcmcvMjAxOC9jcmVkZW50aWFscy9leGFtcGxlcy92MSJdLCJpZCI6Ijg3N2JiYmVlLTJjYzUtNGJlZC04NzFmLWQ5ZGIwNjkzNjY1YiIsInR5cGUiOlsiVmVyaWZpYWJsZUNyZWRlbnRpYWwiLCJVc2VyIl0sImNyZWRlbnRpYWxTdWJqZWN0Ijp7Im5hbWUiOiJXaWxzb24gU21pdGgiLCJFbWFpbCI6IndzQGV4YW1wbGUuY29tIiwiaWQiOiJkaWQ6dW5rbm93biJ9LCJpc3N1ZXIiOnsiaWQiOiJkaWQ6a2V5OnYwMDE6ejZNa21RU1h2YTl2RG8zQVNyUEVraWtQM0sxeXlpQ1Z2ZDVLbTh4amJGakdkTnc0IiwibmFtZSI6Ik1OIHNpZGVvcyBUcnVzdCBTZXJ2aWNlcyJ9LCJpc3N1YW5jZURhdGUiOiIyMDI0LTAyLTIzVDE5OjQ5OjM1KzAwOjAwIiwiZXhwaXJhdGlvbkRhdGUiOiIyMDI1LTAyLTIyVDE5OjQ5OjM1KzAwOjAwIiwiZXhwIjoxNzQwMjUzNzc1MjI2LCJwcm9vZiI6eyJ0eXBlIjoiRWQyNTUxOVNpZ25hdHVyZTIwMjAiLCJjcmVhdGVkIjoiMjAyNC0wMi0yM1QxOTo0OTozNS4zMDlaIiwiandzIjoiZXlKMGVYQWlPaUpLVjFRaUxDSmhiR2NpT2lKRlpFUlRRU0o5Li43VUtkYXlaUmlhNlNFOW5BVXFQLTFtNER1OWtsUDY0Y2RYUnFWclRBYXlRcE5DUElqdDRGakxDTU5DUlRMOUNlU2V0UFI3VWtLSmJyeHl3UDF6SGZBdyIsInByb29mUHVycG9zZSI6ImFzc2VydGlvbk1ldGhvZCIsInZlcmlmaWNhdGlvbk1ldGhvZCI6ImRpZDprZXk6djAwMTp6Nk1rbVFTWHZhOXZEbzNBU3JQRWtpa1AzSzF5eWlDVnZkNUttOHhqYkZqR2ROdzQifX1dLCJwcm9vZiI6eyJjaGFsbGVuZ2UiOiIxMjM0NTY3ODkwIiwidmVyaWZpY2F0aW9uTWV0aG9kIjoiZGlkOmtleTp2MDAxOno2TWttUVNYdmE5dkRvM0FTclBFa2lrUDNLMXl5aUNWdmQ1S204eGpiRmpHZE53NCIsImNyZWF0ZWQiOiIyMDI0LTAyLTIzVDE5OjQ5OjM1KzAwOjAwIiwiZG9tYWluIjoiaHR0cHM6Ly9jYWxsYmFjay5leGFtcGxlLmNvbSIsImp3cyI6IjI5a2J5T3pTcDRreEU2MnRWQ2pzVWZ4NEFIM0RaLUw1Ql9RVEJyc1BsdFViOE5QZXRteU5GWUlhWEVFdGdma3UwVXgweWFLU3VObDVBQUl1TW5fY0JBIiwicHJvb2ZQdXJwb3NlIjoiYXV0aGVudGljYXRpb24iLCJ0eXBlIjoiRVMyNTYifSwidHlwZSI6WyJWZXJpZmlhYmxlUHJlc2VudGF0aW9uIiwiQ3JlZGVudGlhbE9mZmVyIl19.2mxmsQ10dGKHbqTrJEQci5MDiTOPFGZHrHKCtS2R5qruNBEGtdxaGVSVy4iJmXlTf3JS7L7AzE2aTA5laAFLCA"
+    TemplateDef:
+      type: object
+      properties:
+        templateid:
+          type: number
+          format: integer
+          example: 18
+        domain:
+          type: string
+          format: url
+          example: "https://yourdomain/callback"
+        challenge: 
+          type: string
+          example: A08935CF-FAEF-4978-81FF-BA4BBD757727
+        dataset:
+          type: object
+          example: {"email":"DataFeedItem","name":"DataFeedItem"}
+    VerifiableCredential:
+      type: array
+      items:
+        type: object
+        properties:
+          "@context":
+            type: array
+            items:
+              type: string
+          id: 
+            type: string
+          type: 
+            type: array
+            items: 
+              type: string
+          credentialSubject: 
+            type: object
+          issuer:
+            type: object
+          issuanceDate: 
+            type: string
+          expirationDate:
+            type: string
+          exp: 
+            type: number
+            format: integer
+            example: 0
+          proof: 
+            type: object
+            properties: 
+              created: 
+                type: string
+              jws: 
+                type: string
+                format: base64
+              proofPurpose: 
+                type: string
+              type: 
+                type: string
+    VerifiablePresentation:
+      type: object
+      properties: 
+        "@context":
+          type: array
+          items:
+            type: string
+        type: 
+          type: array
+          items: 
+            type: string
+        verifiableCredential:
+          $ref: "#/components/schemas/VerifiableCredential"
+        proof:
+          type: object
+          properties: 
+            challenge: 
+              type: string
+            created: 
+              type: string
+            domain: 
+              type: string
+            jws: 
+              type: string
+            proofPurpose: 
+              type: string
+            type: 
+              type: string
+        iat: 
+          type: number
+          format: integer
+          example: 0
+        iss: 
+          type: string
+        aud: 
+          type: string
+        sub: 
+          type: string
+        exp: 
+          type: number
+          format: integer
+          example: 0
+        jti: 
+          type: string
+    Error400:
+      type: object
+      properties:
+        errorMessage:
+          type: string
+          example: "Required input fields cannot be empty"
+        frontendCode:
+          type: string
+          example: "0x2012"
+    Error403:
+      type: object
+      properties:
+        errorMessage:
+          type: string
+          example: "X Token does not exist"
+        frontendCode:
+          type: string
+          example: "0x2012"
+    Error500:
+      type: object
+      properties:
+        errorMessage:
+          type: string
+          example: "Could not find Template/Template does not exists"
+        frontendCode:
+          type: string
+          example: "0x2012"
+  securitySchemes:
+    ApiKeyAuth:        
+      type: apiKey
+      in: header 
+      name: X-TOKEN
+security:
+  - ApiKeyAuth: [] 
