@@ -62,9 +62,7 @@ See [creating-a-credential-type.md](creating-a-credential-type.md "mention")for 
 
 ## Next Steps
 
-How you have all the core elements in place. Next would be to issue the created credentials to your users. For this, we have created a powerful yet lean API. To send and request credentials, follow the steps mentioned in our API documentation // HERE.&#x20;
-
-Furthermore, the SDK documentation can be found // HERE.
+How you have all the core elements in place. Next would be to issue the created credentials to your users. For this, we have created a powerful yet lean API. To send and request credentials, follow the steps mentioned in our API documentation here: [api-reference](../reference/api-reference/ "mention").&#x20;
 
 ## Transactions
 
