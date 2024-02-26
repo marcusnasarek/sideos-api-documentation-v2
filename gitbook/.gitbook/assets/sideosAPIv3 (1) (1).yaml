@@ -2,7 +2,7 @@ openapi: 3.0.0
 info:
   title: sideos API
   description: Optional multiline or single-line description in [CommonMark](http://commonmark.org/help/) or HTML.
-  version: 1.0.10
+  version: 1.0.1
   license: 
     name: sideos
     url: https://www.sideos.io/terms-conditions
@@ -34,7 +34,27 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/OfferVCRequest"
+              type: object
+              properties:
+                templateid:
+                  type: number
+                  format: integer
+                  example: 57
+                  description: "the template id refers to the credential type created in the administration console."
+                challenge:
+                  type: string
+                  format: string
+                  example: "634F5950-DA17-4441-ABEC-9765FF1D55C0"
+                  description: "unique id for the server to identify the session/request."
+                domain:
+                  type: string
+                  format: url
+                  example: "https://issuer.example.com/consumeoffer"
+                  description: "the callback url where the wallet sends the accepted credential to. Needs to respond with 200 to make the wallet storing the credential."
+                dataset:
+                  type: object
+                  example: '{ "name": "Will Smith", "email": "ws@example.com" }'
+                  description: "object contains the claims that should be put in the credential. Need to match the template referred to with the 'templateid' field."
       responses:
         '200':    # status code
           description: Response is a Verifiable Credential provded as a base64-encoded JWT.
@@ -130,7 +150,23 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/RequestVCRequest"
+              type: object
+              properties:
+                templateid:
+                  type: number
+                  format: integer
+                  example: 57
+                  description: "the template id refers to the credential type created in the administration console."
+                challenge:
+                  type: string
+                  format: string
+                  example: "634F5950-DA17-4441-ABEC-9765FF1D55C0"
+                  description: "unique id for the server to identify the session/request."
+                domain:
+                  type: string
+                  format: url
+                  example: "https://issuer.example.com/consumeoffer"
+                  description: "the callback url where the wallet sends the accepted credential to. Needs to respond with 200 to make the wallet storing the credential."
       responses:
         '200':    # status code
           description: Response is a Verifiable Credential provded as a base64-encoded JWT.
@@ -271,7 +307,7 @@ paths:
       security: 
         -  ApiKeyAuth: []
       operationId: createSignedVc
-      summary: Create a signed Veriable Credential Offer
+      summary: Create a signed VC Offer
       description: Based on the dataset provided and the audience identifier a Veriable Credential is created.
       requestBody: 
         content:
@@ -317,159 +353,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Error500"
-  /createofferrequestvc:
-    post: 
-      tags: 
-        -  "Offer"
-      security: 
-        -  ApiKeyAuth: []
-      operationId: createOfferRequestVc
-      summary: Create an Offer and a Request for a Veriable Credential
-      description: Based on the data set provided a Veriable Credential is created and requested in a single step.
-      requestBody: 
-        content: 
-          application/json:
-            schema: 
-              $ref: "#/components/schemas/OfferVCRequest"
-      responses:
-        '200':    # status code
-          description: Response is a Verifiable Credential provded as a base64-encoded JWT.
-          content:
-            application/json:
-              schema: 
-                type: object
-                properties: 
-                  data:
-                    $ref: "#/components/schemas/OfferVC"
-        '400':
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error400"
-        '403':
-          description: Unauthorized Access
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error403"
-        '500':
-          description: Server Error
-          content:
-            application/json:
-              schema:
                 $ref: "#/components/schemas/Error500"      
-  /createlocaldid:
-    post: 
-      tags: 
-        -  "Wallet"
-      security: 
-        -  ApiKeyAuth: []
-      operationId: createLocalDid
-      summary: Create a local DID
-      description: Create a local DID based on the key material provided
-      responses:
-        '200':
-          description: response is a wallet object including the DID and keys. 
-          content:
-            application/json:
-              schema: 
-                $ref: '#/components/schemas/LocalDid'
-        '400':
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error400"
-        '403':
-          description: Unauthorized Access
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error403"
-        '500':
-          description: Server Error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error500"
-  /createpublicdid:
-    post: 
-      tags: 
-        -  "Wallet"
-      security: 
-        -  ApiKeyAuth: []
-      operationId: createPublicDid
-      summary: Create a public DID
-      description: Create a public DID hold in a cloud wallet as a sub-tenant of your sideos account. The DID can be optionally anchored on a Blockchain (Tezoz, Ethereum). You need to be a admin of a multi-tenant account.
-      requestBody: 
-        content:
-          application/json:
-            schema: 
-              $ref: "#/components/schemas/WalletRequest"    
-      responses:
-        '200':
-          description: Wallet created
-          content:
-            application/json:
-              schema: 
-                type: object
-                properties:
-                  did:
-                    type: string
-                    example: did:sideos:V002:z6MkjEHR5a1Eii2DYwds5mFZ2Bgpuq4h7EQoawKBm9BFsmSj
-                  token:
-                    type: string
-        '400':
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error400"
-        '422':
-          description: Unprocessable Content.
-          content:
-            application/json:
-              schema: 
-                $ref: "#/components/schemas/Error422" 
-        '403':
-          description: Unauthorized Access
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error403"
-        '500':
-          description: Server Error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error500"       
 components:
   schemas:
-    OfferVCRequest:
-      type: object
-      description: The data set to be send to the API to request an Offer creation.
-      properties:
-        templateid:
-          type: number
-          format: integer
-          example: 57
-          description: "the template id refers to the credential type created in the administration console."
-        challenge:
-          type: string
-          format: string
-          example: "634F5950-DA17-4441-ABEC-9765FF1D55C0"
-          description: "unique id for the server to identify the session/request."
-        domain:
-          type: string
-          format: url
-          example: "https://issuer.example.com/consumeoffer"
-          description: "the callback url where the wallet sends the accepted credential to. Needs to respond with 200 to make the wallet storing the credential."
-        dataset:
-          type: object
-          example: '{ "name": "Will Smith", "email": "ws@example.com" }'
-          description: "object contains the claims that should be put in the credential. Need to match the template referred to with the 'templateid' field."
     OfferVC:
       type: object
       properties: 
@@ -498,25 +384,6 @@ components:
           type: string
           format: base64
           example: "eyJ0eXAiOiJKV1QiLCJhbGciOiJFZERTQSJ9.eyJAY29udGV4dCI6WyJodHRwczovL3d3dy53My5vcmcvMjAxOC9jcmVkZW50aWFscy92MSIsImh0dHBzOi8vanVuby5zaWRlb3MuaW8vY29udGV4dC9wcm9vZnN0eXBlcyJdLCJpYXQiOjE3MDg3MTc3NzUzOTEsImlzcyI6ImRpZDprZXk6djAwMTp6Nk1rbVFTWHZhOXZEbzNBU3JQRWtpa1AzSzF5eWlDVnZkNUttOHhqYkZqR2ROdzQiLCJhdWQiOiJkaWQ6dW5rbm93biIsInN1YiI6ImRpZDp1bmtub3duIiwiZXhwIjoxNzA4NzE3Nzc4OTkxLCJqdGkiOiJiMDMyZThlMy1iY2Q2LTQ0NWItYTQ5OS02ZWZjYzMwMTcyZjAiLCJ2ZXJpZmlhYmxlQ3JlZGVudGlhbCI6W3siQGNvbnRleHQiOlsiaHR0cHM6Ly93d3cudzMub3JnLzIwMTgvY3JlZGVudGlhbHMvdjEiLCJodHRwczovL3d3dy53My5vcmcvMjAxOC9jcmVkZW50aWFscy9leGFtcGxlcy92MSJdLCJpZCI6Ijg3N2JiYmVlLTJjYzUtNGJlZC04NzFmLWQ5ZGIwNjkzNjY1YiIsInR5cGUiOlsiVmVyaWZpYWJsZUNyZWRlbnRpYWwiLCJVc2VyIl0sImNyZWRlbnRpYWxTdWJqZWN0Ijp7Im5hbWUiOiJXaWxzb24gU21pdGgiLCJFbWFpbCI6IndzQGV4YW1wbGUuY29tIiwiaWQiOiJkaWQ6dW5rbm93biJ9LCJpc3N1ZXIiOnsiaWQiOiJkaWQ6a2V5OnYwMDE6ejZNa21RU1h2YTl2RG8zQVNyUEVraWtQM0sxeXlpQ1Z2ZDVLbTh4amJGakdkTnc0IiwibmFtZSI6Ik1OIHNpZGVvcyBUcnVzdCBTZXJ2aWNlcyJ9LCJpc3N1YW5jZURhdGUiOiIyMDI0LTAyLTIzVDE5OjQ5OjM1KzAwOjAwIiwiZXhwaXJhdGlvbkRhdGUiOiIyMDI1LTAyLTIyVDE5OjQ5OjM1KzAwOjAwIiwiZXhwIjoxNzQwMjUzNzc1MjI2LCJwcm9vZiI6eyJ0eXBlIjoiRWQyNTUxOVNpZ25hdHVyZTIwMjAiLCJjcmVhdGVkIjoiMjAyNC0wMi0yM1QxOTo0OTozNS4zMDlaIiwiandzIjoiZXlKMGVYQWlPaUpLVjFRaUxDSmhiR2NpT2lKRlpFUlRRU0o5Li43VUtkYXlaUmlhNlNFOW5BVXFQLTFtNER1OWtsUDY0Y2RYUnFWclRBYXlRcE5DUElqdDRGakxDTU5DUlRMOUNlU2V0UFI3VWtLSmJyeHl3UDF6SGZBdyIsInByb29mUHVycG9zZSI6ImFzc2VydGlvbk1ldGhvZCIsInZlcmlmaWNhdGlvbk1ldGhvZCI6ImRpZDprZXk6djAwMTp6Nk1rbVFTWHZhOXZEbzNBU3JQRWtpa1AzSzF5eWlDVnZkNUttOHhqYkZqR2ROdzQifX1dLCJwcm9vZiI6eyJjaGFsbGVuZ2UiOiIxMjM0NTY3ODkwIiwidmVyaWZpY2F0aW9uTWV0aG9kIjoiZGlkOmtleTp2MDAxOno2TWttUVNYdmE5dkRvM0FTclBFa2lrUDNLMXl5aUNWdmQ1S204eGpiRmpHZE53NCIsImNyZWF0ZWQiOiIyMDI0LTAyLTIzVDE5OjQ5OjM1KzAwOjAwIiwiZG9tYWluIjoiaHR0cHM6Ly9jYWxsYmFjay5leGFtcGxlLmNvbSIsImp3cyI6IjI5a2J5T3pTcDRreEU2MnRWQ2pzVWZ4NEFIM0RaLUw1Ql9RVEJyc1BsdFViOE5QZXRteU5GWUlhWEVFdGdma3UwVXgweWFLU3VObDVBQUl1TW5fY0JBIiwicHJvb2ZQdXJwb3NlIjoiYXV0aGVudGljYXRpb24iLCJ0eXBlIjoiRVMyNTYifSwidHlwZSI6WyJWZXJpZmlhYmxlUHJlc2VudGF0aW9uIiwiQ3JlZGVudGlhbE9mZmVyIl19.2mxmsQ10dGKHbqTrJEQci5MDiTOPFGZHrHKCtS2R5qruNBEGtdxaGVSVy4iJmXlTf3JS7L7AzE2aTA5laAFLCA"
-    RequestVCRequest:
-      type: object
-      description: The data set to be send to the API to request an Request creation.
-      properties:
-        templateid:
-          type: number
-          format: integer
-          example: 57
-          description: "the template id refers to the credential type created in the administration console."
-        challenge:
-          type: string
-          format: string
-          example: "634F5950-DA17-4441-ABEC-9765FF1D55C0"
-          description: "unique id for the server to identify the session/request."
-        domain:
-          type: string
-          format: url
-          example: "https://issuer.example.com/consumeoffer"
-          description: "the callback url where the wallet sends the accepted credential to. Needs to respond with 200 to make the wallet storing the credential."
     TemplateDef:
       type: object
       properties:
@@ -617,84 +484,12 @@ components:
           example: 0
         jti: 
           type: string
-    WalletRequest:
-      type: object
-      properties:
-        name:
-          type: string
-          description: the name of the wallet. Must be unique.
-          example: "ACME Wallet"
-        anchored: 
-          type: boolean
-          example: true  
-    LocalDid:
-      type: object
-      properties:
-        error:
-          type: string
-          example: false,
-        did:
-          type: string
-          format: did
-          example: did:key:v004:z6MkrL41Eo41aHPhrdEAatCqYc7TiU3PHso5fLyNE7sfbkfQ
-        pubkey:
-          type: object
-          properties: 
-            crv: 
-              type: string
-              example: Ed25519
-            d:
-              type: string
-            x: 
-              type: string
-              example: RvdvCO9qwwB-xeWG4YzbEae4g8iZlIBi5U5hO1CHUPQ
-            kty:
-              type: string
-              example: OKP
-            use:
-              type: string
-              example: sig
-        response:
-          type: object
-          properties:
-            acknowledged:
-              type: string
-              example: true
-            insertedId: 
-              type: string
-              example: 65db292432889eff535dee66
-            pubkey:
-              type: object
-              properties: 
-                crv: 
-                  type: string
-                  example: Ed25519
-                d:
-                  type: string
-                x: 
-                  type: string
-                  example: RvdvCO9qwwB-xeWG4YzbEae4g8iZlIBi5U5hO1CHUPQ
-                kty:
-                  type: string
-                  example: OKP
-                use:
-                  type: string
-                  example: sig
     Error400:
       type: object
       properties:
         errorMessage:
           type: string
           example: "Required input fields cannot be empty"
-        frontendCode:
-          type: string
-          example: "0x2012"
-    Error422:
-      type: object
-      properties:
-        errorMessage:
-          type: string
-          example: "Wallet name must be unique"
         frontendCode:
           type: string
           example: "0x2012"

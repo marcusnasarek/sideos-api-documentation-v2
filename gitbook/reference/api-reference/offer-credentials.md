@@ -2,7 +2,7 @@
 description: Issue credentials to an SSI wallet
 ---
 
-# Offer Credentials
+# 📄 Offer Credentials
 
 ## Introduction
 
@@ -24,21 +24,30 @@ See the diagram below for the flow chart for a credential offer.&#x20;
 
 <figure><img src="../../.gitbook/assets/sideos API Offer Flow.png" alt=""><figcaption><p>Verifiable Credential offer flow</p></figcaption></figure>
 
-{% swagger src="../../.gitbook/assets/sideosAPIv3 (2).yaml" path="/createoffervc" method="post" %}
-[sideosAPIv3 (2).yaml](<../../.gitbook/assets/sideosAPIv3 (2).yaml>)
+{% swagger src="../../.gitbook/assets/sideosAPIv3 (2) (1).yaml" path="/createoffervc" method="post" %}
+[sideosAPIv3 (2) (1).yaml](<../../.gitbook/assets/sideosAPIv3 (2) (1).yaml>)
 {% endswagger %}
 
-{% swagger src="../../.gitbook/assets/sideosAPIv3 (2).yaml" path="/consumeoffer" method="post" %}
-[sideosAPIv3 (2).yaml](<../../.gitbook/assets/sideosAPIv3 (2).yaml>)
+{% swagger src="../../.gitbook/assets/sideosAPIv3 (2) (1).yaml" path="/consumeoffer" method="post" %}
+[sideosAPIv3 (2) (1).yaml](<../../.gitbook/assets/sideosAPIv3 (2) (1).yaml>)
 {% endswagger %}
 
 ## Signed Credentials
 
-The regular credential issue flow creates a credential offer and presents the Verifiable Credential to the wallet e.g., via QR Code  to pick it up. Because the SSI audience (DID of the SSI wallet) is not known in the moment of the credential creation, the provision channel needs to be trustworthy.&#x20;
+The basic credential issue flow creates a credential offer and presents the Verifiable Credential to the wallet e.g., via QR Code  to pick it up. Because the SSI audience (DID of the SSI wallet) is not known in the moment of the credential creation, the provision channel needs to be trustworthy.&#x20;
+
+There are several protocols available, some more and others less complex. In many cases in the enterprise environment you already have a secure environment, e.g. via intranet pages or email. Here you can strip down the protocol to a simple credential provision without an embedded channel authentication and rely on the secure environment.&#x20;
 
 There is an endpoint to create a Verifiable Credential that includes the audience (DID) as an id in the credential subject. That way, the DID of the wallet can be included in the credential subject and thus, being ensured to be stored and used only on the respective SSI Wallet.&#x20;
 
-{% swagger src="../../.gitbook/assets/sideosAPIv3 (2).yaml" path="/createsignedvc" method="post" %}
-[sideosAPIv3 (2).yaml](<../../.gitbook/assets/sideosAPIv3 (2).yaml>)
+{% swagger src="../../.gitbook/assets/sideosAPIv3 (2) (1).yaml" path="/createsignedvc" method="post" %}
+[sideosAPIv3 (2) (1).yaml](<../../.gitbook/assets/sideosAPIv3 (2) (1).yaml>)
 {% endswagger %}
 
+## Offer and Request Credentials in 1 step
+
+Imagine a flow, where the user doesn't have a credential yet and is in an onboarding flow. You could issue a credential and immediately request it for migrating the user into the new SSI flow. In that case you could use the offer\&request endpoint
+
+{% swagger src="../../.gitbook/assets/sideosAPIv3.yaml" path="/createofferrequestvc" method="post" %}
+[sideosAPIv3.yaml](../../.gitbook/assets/sideosAPIv3.yaml)
+{% endswagger %}

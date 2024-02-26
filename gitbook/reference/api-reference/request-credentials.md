@@ -2,7 +2,7 @@
 description: Request credentials from an SSI wallet
 ---
 
-# Request Credentials
+# 🆗 Request Credentials
 
 ## Introduction
 
@@ -24,11 +24,11 @@ See the diagram below for the flow chart for a credential request.&#x20;
 
 <figure><img src="../../.gitbook/assets/sideos API Request Flow.png" alt=""><figcaption></figcaption></figure>
 
-{% swagger src="../../.gitbook/assets/sideosAPIv3.yaml" path="/createrequestvc" method="post" %}
-[sideosAPIv3.yaml](../../.gitbook/assets/sideosAPIv3.yaml)
+{% swagger src="../../.gitbook/assets/sideosAPIv3 (2).yaml" path="/createrequestvc" method="post" %}
+[sideosAPIv3 (2).yaml](<../../.gitbook/assets/sideosAPIv3 (2).yaml>)
 {% endswagger %}
 
-{% swagger src="../../.gitbook/assets/sideosAPIv3.yaml" path="/consumerequest" method="post" %}
-[sideosAPIv3.yaml](../../.gitbook/assets/sideosAPIv3.yaml)
+{% swagger src="../../.gitbook/assets/sideosAPIv3 (2).yaml" path="/consumerequest" method="post" %}
+[sideosAPIv3 (2).yaml](<../../.gitbook/assets/sideosAPIv3 (2).yaml>)
 {% endswagger %}
 
