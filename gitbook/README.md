@@ -20,7 +20,7 @@ layout:
     visible: true
 ---
 
-# 👩‍🏫 Welcome!
+# Welcome!
 
 ## Overview
 

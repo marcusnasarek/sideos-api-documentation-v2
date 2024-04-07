@@ -1,4 +1,4 @@
-# ⚡ Quick Start
+# Quick Start
 
 ## Setting the Scene
 
@@ -44,36 +44,30 @@ To make your first request, send an authenticated request to the pets endpoint. 
 
 ## Create a credential Offer
 
-{% swagger baseUrl="https//juno.sideos.io/api/v3/createoffervc" method="post" path="/" summary="Create a credential offer." expanded="false" %}
-{% swagger-description %}
+## Create a credential offer.
+
+<mark style="color:green;">`POST`</mark> `https//juno.sideos.io/api/v3/createoffervc/`
+
 Creates a credential offer based on the credential containing the claim data provided in the request.
-{% endswagger-description %}
 
-{% swagger-parameter in="body" name="templateid" required="true" type="number" %}
-The `id` of the credential type
-{% endswagger-parameter %}
+#### Headers
 
-{% swagger-parameter in="body" name="dataset" required="true" type="object" %}
-The data set for the credential offer
-{% endswagger-parameter %}
+| Name                                      | Type             | Description |
+| ----------------------------------------- | ---------------- | ----------- |
+| Content Type                              | application/json |             |
+| X-Token<mark style="color:red;">\*</mark> | \<API Key>       |             |
 
-{% swagger-parameter in="body" name="domain" required="true" type="string" %}
-The callback URL
-{% endswagger-parameter %}
+#### Request Body
 
-{% swagger-parameter in="body" name="challenge" required="true" type="string" %}
-An unique identifier for the user session.
-{% endswagger-parameter %}
+| Name                                         | Type   | Description                                |
+| -------------------------------------------- | ------ | ------------------------------------------ |
+| templateid<mark style="color:red;">\*</mark> | number | The `id` of the credential type            |
+| dataset<mark style="color:red;">\*</mark>    | object | The data set for the credential offer      |
+| domain<mark style="color:red;">\*</mark>     | string | The callback URL                           |
+| challenge<mark style="color:red;">\*</mark>  | string | An unique identifier for the user session. |
 
-{% swagger-parameter in="header" name="Content Type" type="application/json" %}
-
-{% endswagger-parameter %}
-
-{% swagger-parameter in="header" name="X-Token" type="<API Key>" required="true" %}
-
-{% endswagger-parameter %}
-
-{% swagger-response status="200" description="credential offer successfully created" %}
+{% tabs %}
+{% tab title="200 credential offer successfully created" %}
 ```json
 {
     "data": {
@@ -83,12 +77,12 @@ An unique identifier for the user session.
     }
 }
 ```
-{% endswagger-response %}
+{% endtab %}
 
-{% swagger-response status="401" description="Permission denied" %}
+{% tab title="401 Permission denied" %}
 
-{% endswagger-response %}
-{% endswagger %}
+{% endtab %}
+{% endtabs %}
 
 Take a look at how you might call this method using `Typescript code`, or via `curl`:
 

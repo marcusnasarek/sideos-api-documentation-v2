@@ -2,7 +2,7 @@
 description: API endpoints to create local and public DIDs
 ---
 
-# 🪪 Wallets
+# Wallets
 
 A Decentralized Identifier (DID) comes in different flavours. We are using 2 types of DIDs in the sideos ecosystem:
 

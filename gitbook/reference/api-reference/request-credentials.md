@@ -2,7 +2,7 @@
 description: Request credentials from an SSI wallet
 ---
 
-# 🆗 Request Credentials
+# Request Credentials
 
 ## Introduction
 

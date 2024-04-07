@@ -2,7 +2,7 @@
 description: Issue credentials to an SSI wallet
 ---
 
-# 📄 Offer Credentials
+# Offer Credentials
 
 ## Introduction
 
