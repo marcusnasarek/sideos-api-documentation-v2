@@ -35,18 +35,18 @@ That said, the general setup is therefore two-folded for 1) providing data and 2
 
 <figure><img src=".gitbook/assets/figure Home 1.png" alt=""><figcaption><p>issuing and verifying credentials</p></figcaption></figure>
 
-The API is build around these 2 general flows. To access the API you need to retrieve an API Key. To get one, sign up for an account with sideos there is a free trial account to get started:
+The API is build around these 2 general flows. We've prepared an example for a small web service that integrates with the sideos API to provide a passwordless login bases on SSI credentials. You can start from there to see the API in action and get your hands dirty:
 
-{% content-ref url="sign-up-and-get-started/" %}
-[sign-up-and-get-started](sign-up-and-get-started/)
+{% content-ref url="quick-start.md" %}
+[quick-start.md](quick-start.md)
 {% endcontent-ref %}
 
 ## Want to jump right in?
 
-With your brand new API Key you are ready to jump right in. Read the quick start doc and get your hands dirty:
+To access the API you need to retrieve an API Key. To get one, sign up for an account with sideos there is a free trial account to get started:
 
-{% content-ref url="quick-start.md" %}
-[quick-start.md](quick-start.md)
+{% content-ref url="sign-up-and-get-started/" %}
+[sign-up-and-get-started](sign-up-and-get-started/)
 {% endcontent-ref %}
 
 ## Want to deep dive?
