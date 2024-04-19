@@ -1,151 +1,330 @@
+---
+description: Integrating sideos into a web service
+---
+
 # Quick Start
 
-## Setting the Scene
+## Passwordless Login with SSI
 
-There are 3 basic components in an SSI flow:&#x20;
+If you want to try out a simple example using a verifiable credential for a passwordless login to your web service,  you can start with an example code available on [Github](https://github.com/rheikvaneyck/sideos-login). It's a simple node.js based web service which integrates sideos for a passwordless login.&#x20;
 
-1. **The SSI wallet**. Credentials will be stored in an SSI wallet. The wallet manages the cryptographic keys, interacts with issuers and verifiers and allows the user to decide which credentials are to be stored to shared.&#x20;
-2. **The Issuer**. Credentials are created by an issuer and provided to the Holder of the SSI wallet. Issuers converting data to verifiable credentials by building JSON data files following the SSI standards, in our case the W3C DID specification and signing the credentials with their private key.
-3. **The Verifier**. Credentials provided by an SSI wallet can be used for example to login into a web service. The web service verifies the credential and checks the claims, the signatures, and who issued the credentials. If all is ok, the web services grants access eventually.
+The example should help you to understand the basic flow of issuing and verifying a credential. Let's start with downloading the sideos wallet and setting up the web service that will interact with the user.
 
-sideos helps Issuers and Verifiers to use the SSI protocol with very little effort. The API is called to wrap data into SSI protocol and allow for example a Web Service to interact with SSI wallets.&#x20;
+### Get the sideos Wallet
 
-Lets assume you want to provide a user with a credential, e.g. to provide a login credential for a web service. In that example, the **Web Service** is the **issuer** and will create a login credential from a user's _Name_ and _Email Address_ with the help of the **sideos API.** The Web Service will then offer the credential to the **SSI Wallet** that stores the credential securely for the later use as a Login credential.
+First, you need do get the sideos wallet to get started. You can install the sideos wallet from [Google Play](https://play.google.com/store/apps/details?id=com.sideosmobile) or [Apple's App Store](https://apps.apple.com/de/app/sideos-transponder/id1611001158?l=en).
 
-<figure><img src=".gitbook/assets/Basic Credential Offer.png" alt=""><figcaption><p>A basic credential issuance flow</p></figcaption></figure>
+&#x20;Once you've installed the wallet proceed below.&#x20;
 
-The steps are:
+### Setting up a Web Service
 
-1. The web application (**Web Service**) calls the sideos API posting the dataset to the `/v3/createoffervc` endpoint. The dataset contains the credential ID, the claims, and a callback url.
-2. The **sideos API** responds with an credential offer provided as a JWT to the **Web Service**.
-3. The **Web Service** presents the JWT to the **SSI wallet**. That can be done as a QR Code, via NFC, or via Bluetooth.&#x20;
-4. The **SSI wallet** validates the credential offer and asks the user to accept the credential offer. If the user accepts the **SSI wallet** calls the callback url by posting the JWT back to the **Web Service**.
-5. The **Web Service** optionally checks the validity of the JWT with the **sideos API** calling the `/v3/consumeoffer` endpoint.  &#x20;
-6. The **sideos API** responds with the original JWT and an error code. The **Web Service** can now do the magic based on the credential acceptance status, e.g. by marking the status in some database or providing some conditional information on the web application.&#x20;
-7. The **Web Service** responds with the status 200 to the **SSI wallet** if the validation was successful.
+Make sure you have Node.js (>18) and yarn installed. There are plenty of instructions available in the internet to help you install Node.js on your system.&#x20;
 
-Lets do this simple flow in an example below.&#x20;
+Next step is to clone the example repo locally:&#x20;
 
-## Get your API key
-
-Your API requests are authenticated using an API key. Any request that doesn't include an API key will return an error.
-
-You can generate an API key from your sideos administration console at any time. See [sign-up-and-get-started](sign-up-and-get-started/ "mention") for information how to get started and retrieve an API key.
-
-## Get a credential ID
-
-You need a credential type that includes the Name and Email Address of the user. See section [creating-a-credential-type.md](sign-up-and-get-started/creating-a-credential-type.md "mention").&#x20;
-
-## Make your first request
-
-Now when you have your API Key and a credential ID for your defined credential template, you can call the sideos API to get a credential offer for issuing a credential.&#x20;
-
-To make your first request, send an authenticated request to the pets endpoint. This will create a `credential offer`, which can be captured by the user and stored on the sideos wallet.
-
-## Create a credential Offer
-
-## Create a credential offer.
-
-<mark style="color:green;">`POST`</mark> `https//juno.sideos.io/api/v3/createoffervc/`
-
-Creates a credential offer based on the credential containing the claim data provided in the request.
-
-#### Headers
-
-| Name                                      | Type             | Description |
-| ----------------------------------------- | ---------------- | ----------- |
-| Content Type                              | application/json |             |
-| X-Token<mark style="color:red;">\*</mark> | \<API Key>       |             |
-
-#### Request Body
-
-| Name                                         | Type   | Description                                |
-| -------------------------------------------- | ------ | ------------------------------------------ |
-| templateid<mark style="color:red;">\*</mark> | number | The `id` of the credential type            |
-| dataset<mark style="color:red;">\*</mark>    | object | The data set for the credential offer      |
-| domain<mark style="color:red;">\*</mark>     | string | The callback URL                           |
-| challenge<mark style="color:red;">\*</mark>  | string | An unique identifier for the user session. |
-
-{% tabs %}
-{% tab title="200 credential offer successfully created" %}
-```json
-{
-    "data": {
-        "error": 0,
-        "jwt": string,
-        "signid": [string],
-    }
-}
 ```
-{% endtab %}
-
-{% tab title="401 Permission denied" %}
-
-{% endtab %}
-{% endtabs %}
-
-Take a look at how you might call this method using `Typescript code`, or via `curl`:
-
-{% tabs %}
-{% tab title="curl" %}
-{% code overflow="wrap" %}
+git clone git@github.com:rheikvaneyck/sideos-login.git
 ```
-curl https://juno.sideos.io/v3/createoffervc/  
-    -H 'X-Token: <YOUR_API_KEY>'
-    -H 'Content-Type: application/json'  
-    -d '{"templateid":<YOUR_CREDENTIAL_ID>,
-    "dataset":{"name":"Wilson Smith","email":"ws@example.com"},
-    "challenge":"1234567890",
-    "domain":"https://callback.example.com"}' 
-```
-{% endcode %}
-{% endtab %}
 
-{% tab title="Typescript" %}
+We have prepared a trial `ACCESS_TOKEN` and a credential template (`LOGIN_TEMPLATE_ID=63`) that you will need to access the sideos API for issuance and verification of credentials. To generate your own access token and to create your own credential templates you can [open an account on the sideos console](sign-up-and-get-started/) for free.
+
+To use it in the example service, create an `.env` file to the root folder of the repository and add the following content:
+
+```
+ACCESS_TOKEN=dee7dbfb-51fb-4dd7-a4c8-b9956633038a
+SSI_SERVER='https://juno.sideos.io'
+LOGIN_TEMPLATE_ID=63
+CALLBACK_URL=http://pi3p:9000
+DID_ISSUER=did:key:V001:z6MksS5dgtn8Hiw4VfiQp6E2jnarJgrNDmUKwE8yPcA3Mec6
+SESSION_SECRET=1B80EE50-542D-4527-8767-C0E8A5278F2C
+```
+
+The `CALLBACK_URL` is an API endpoint of your web service to which the wallet sends responses and shared credentials. That needs to be changed to your individual environment. The `DID_ISSUER` is the id of the trial account wallet and will be used to validate the credential.&#x20;
+
+The example is using **redis** as a session storage. To install redis on a Linux-based machine, e.g. using Ubuntu you install and setup the **redis** server as a system service with the following commands:
+
+```
+sudo apt update && sudo apt install redis-server -y
+sudo systemctl enable redis-server
+sudo systemctl start redis-server
+```
+
+Change into the example code folder and install the node packages with&#x20;
+
+```
+yarn install
+```
+
+and start the server with yarn:
+
+```
+yarn start:dev
+```
+
+The output should be something like this below:
+
+```
+yarn start:dev
+yarn run v1.22.21
+$ nodemon src/index.ts
+[nodemon] 2.0.20
+[nodemon] to restart at any time, enter `rs`
+[nodemon] watching path(s): src/**/*
+[nodemon] watching extensions: ts,json
+[nodemon] starting `ts-node ./src/index.ts src/index.ts`
+Server started at http://MacBook-Work.local:9000
+Redis Client connected...
+Redis Client ready
+```
+
+### Issue a Verifiable Credential to Your Wallet
+
+The example web service provides a path to issue a credential. With your browser navigate to `http://<your IP/hostname>:9000/issue` to generate a credential offer and capture the credential in your wallet.&#x20;
+
+<figure><img src=".gitbook/assets/Screenshot 2024-04-19 at 17.21.51.png" alt=""><figcaption><p>Render a credential offer to provider a login credential</p></figcaption></figure>
+
+If you scan the QR Code with the sideos wallet you will see the screen below to accept the credential offer and store it on your phone. If you select the credential and click in CONFIRM the credential is stored on your phone.
+
+<figure><img src=".gitbook/assets/Credential Offer.png" alt="" width="375"><figcaption><p>A credential offer after scanning the QR Code</p></figcaption></figure>
+
+The code to create a issue endpoint to show the QR Code on the frontend is shown below:
+
 ```typescript
-let data = { 
-   headers: {
-      "X-Token": "<YOUR API KEY>",
-      "Content-Type": "application/json"
-   },
-   body: {
-      "templateid": <YOUR TEMPLATE ID>,
-      "domain": "<URL ENDPOINT OF YOUR CALLBACK",
-      "challenge": "<YOUR UNIQUE CHALLENGE TO IDENTIFY THIS CALL",
-      "dataset": {
-         "name": "Wilson Smith",
-         "email":"ws@example.com"
+export const getCredentialOffer = async () => {  
+  const challenge = uuidv4();   
+  try {
+    const response = await axios.post(process.env.SSI_SERVER + '/v3/createoffervc',
+    {
+      templateid: process.env.LOGIN_TEMPLATE_ID,
+      dataset: {
+        Email: "user.name@example.com",
+        name: "Anton Mustermann",
+        Role: "User"
+      },
+      domain: process.env.CALLBACK_URL + '/issue',
+      challenge: challenge
+    },
+    {
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Token': process.env.ACCESS_TOKEN
       }
-   }
-}
-
-let response = client.post("https://juno.sideos.io/v3/createoffervc", data)
-
-// If everything is correct "response" should contain the JWT signed by your account DID wallet, ready to be displayed as a QRCode 
-```
-{% endtab %}
-{% endtabs %}
-
-You will receive a response containing a data object with a jwt field.&#x20;
-
-{% code overflow="wrap" %}
-```json
-{
-    "data": {
-        "error":0,
-        "jwt":"eyJ0eXAiOiJKV1QiLCJhbGciOiJFZERTQSJ9.eyJAY29udGV4dCI6WyJodHRwczovL3d3dy53My5vcmcvMjAxOC9jcmVkZW50aWFscy92MSIsImh0dHBzOi8vanVuby5zaWRlb3MuaW8vY29udGV4dC9wcm9vZnN0eXBlcyJdLCJpYXQiOjE3MDg3MTc3NzUzOTEsImlzcyI6ImRpZDprZXk6djAwMTp6Nk1rbVFTWHZhOXZEbzNBU3JQRWtpa1AzSzF5eWlDVnZkNUttOHhqYkZqR2ROdzQiLCJhdWQiOiJkaWQ6dW5rbm93biIsInN1YiI6ImRpZDp1bmtub3duIiwiZXhwIjoxNzA4NzE3Nzc4OTkxLCJqdGkiOiJiMDMyZThlMy1iY2Q2LTQ0NWItYTQ5OS02ZWZjYzMwMTcyZjAiLCJ2ZXJpZmlhYmxlQ3JlZGVudGlhbCI6W3siQGNvbnRleHQiOlsiaHR0cHM6Ly93d3cudzMub3JnLzIwMTgvY3JlZGVudGlhbHMvdjEiLCJodHRwczovL3d3dy53My5vcmcvMjAxOC9jcmVkZW50aWFscy9leGFtcGxlcy92MSJdLCJpZCI6Ijg3N2JiYmVlLTJjYzUtNGJlZC04NzFmLWQ5ZGIwNjkzNjY1YiIsInR5cGUiOlsiVmVyaWZpYWJsZUNyZWRlbnRpYWwiLCJVc2VyIl0sImNyZWRlbnRpYWxTdWJqZWN0Ijp7Im5hbWUiOiJXaWxzb24gU21pdGgiLCJFbWFpbCI6IndzQGV4YW1wbGUuY29tIiwiaWQiOiJkaWQ6dW5rbm93biJ9LCJpc3N1ZXIiOnsiaWQiOiJkaWQ6a2V5OnYwMDE6ejZNa21RU1h2YTl2RG8zQVNyUEVraWtQM0sxeXlpQ1Z2ZDVLbTh4amJGakdkTnc0IiwibmFtZSI6Ik1OIHNpZGVvcyBUcnVzdCBTZXJ2aWNlcyJ9LCJpc3N1YW5jZURhdGUiOiIyMDI0LTAyLTIzVDE5OjQ5OjM1KzAwOjAwIiwiZXhwaXJhdGlvbkRhdGUiOiIyMDI1LTAyLTIyVDE5OjQ5OjM1KzAwOjAwIiwiZXhwIjoxNzQwMjUzNzc1MjI2LCJwcm9vZiI6eyJ0eXBlIjoiRWQyNTUxOVNpZ25hdHVyZTIwMjAiLCJjcmVhdGVkIjoiMjAyNC0wMi0yM1QxOTo0OTozNS4zMDlaIiwiandzIjoiZXlKMGVYQWlPaUpLVjFRaUxDSmhiR2NpT2lKRlpFUlRRU0o5Li43VUtkYXlaUmlhNlNFOW5BVXFQLTFtNER1OWtsUDY0Y2RYUnFWclRBYXlRcE5DUElqdDRGakxDTU5DUlRMOUNlU2V0UFI3VWtLSmJyeHl3UDF6SGZBdyIsInByb29mUHVycG9zZSI6ImFzc2VydGlvbk1ldGhvZCIsInZlcmlmaWNhdGlvbk1ldGhvZCI6ImRpZDprZXk6djAwMTp6Nk1rbVFTWHZhOXZEbzNBU3JQRWtpa1AzSzF5eWlDVnZkNUttOHhqYkZqR2ROdzQifX1dLCJwcm9vZiI6eyJjaGFsbGVuZ2UiOiIxMjM0NTY3ODkwIiwidmVyaWZpY2F0aW9uTWV0aG9kIjoiZGlkOmtleTp2MDAxOno2TWttUVNYdmE5dkRvM0FTclBFa2lrUDNLMXl5aUNWdmQ1S204eGpiRmpHZE53NCIsImNyZWF0ZWQiOiIyMDI0LTAyLTIzVDE5OjQ5OjM1KzAwOjAwIiwiZG9tYWluIjoiaHR0cHM6Ly9jYWxsYmFjay5leGFtcGxlLmNvbSIsImp3cyI6IjI5a2J5T3pTcDRreEU2MnRWQ2pzVWZ4NEFIM0RaLUw1Ql9RVEJyc1BsdFViOE5QZXRteU5GWUlhWEVFdGdma3UwVXgweWFLU3VObDVBQUl1TW5fY0JBIiwicHJvb2ZQdXJwb3NlIjoiYXV0aGVudGljYXRpb24iLCJ0eXBlIjoiRVMyNTYifSwidHlwZSI6WyJWZXJpZmlhYmxlUHJlc2VudGF0aW9uIiwiQ3JlZGVudGlhbE9mZmVyIl19.2mxmsQ10dGKHbqTrJEQci5MDiTOPFGZHrHKCtS2R5qruNBEGtdxaGVSVy4iJmXlTf3JS7L7AzE2aTA5laAFLCA",
-        "signid":["877bbbee-2cc5-4bed-871f-d9db0693665b"]
+    });
+    return { 
+      data: {
+        error: 0,
+        challenge: challenge,
+        jwt: response.data.data.jwt
+      }
     }
+  } catch (err) {
+    console.log(`Error posting juno at ${process.env.SSI_SERVER}/v3/createoffervc`);
+    console.log(err);
+    return {
+      data: {
+        error: `Error posting juno at ${process.env.SSI_SERVER}/v3/createoffervc`
+      }
+    }  
+  }
 }
 ```
-{% endcode %}
 
-The string is a base64 encoded JWT. Check the jwt string with a JWT parser, e.g. [https://jwt.io](https://jwt.io) to see the content. The JWT can be read by the **sideos wallet**, e.g. as a QR Code and shown to the user like this:
+If you accept the offer the wallet send the confirmation back to the callback url. The web service then knows the credential was accepted and can initiate some completion process.&#x20;
 
-<img src=".gitbook/assets/Iphone 14 - 1 (1).png" alt="" data-size="original">&#x20;
+The example code for the callback endpoint is shown below:
 
-The wallet asks the user to accept or decline the offer. If the user accepts the offer, the credential is stored on the phone and the callback URL from the `domain` field in the credential offer is called to complete the credential acceptance.&#x20;
+```typescript
+export const postConsumeCredentialOffer = async (req: Request, res: Response, next: NextFunction) => {
+  const redisClient = createClient({ legacyMode: true })
+  await redisClient.connect().catch(console.error)
+  
+  try {
+    const jwt = req.body.jwt;
+    let authToken: string = req.params.token;
+    if (!authToken && req.query.challenge) {
+      authToken = <string>req.query.challenge
+    }
+    console.log('Consume Offer challenge parameter:', authToken)
+    let vcs: Array<any> = [];
+    const response = await axios.post(process.env.SSI_SERVER + '/v3/consumeoffer', {
+      template: process.env.TEMPLATE_ID,
+      token: jwt
+    }, {
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Token': process.env.ACCESS_TOKEN
+      }
+    })
+    const res_jwt = response.data.data.jwt
+    const decoded: any = decodeJwt(res_jwt);
+    decoded.verifiableCredential.forEach((element: any) => {
+      vcs.push(element)
+    });
+    console.log('Trusted DID_ISSUER: ', process.env.DID_ISSUER);
+    console.log('email: ', vcs[0].credentialSubject.Email);
+    console.log('Name: ', vcs[0].credentialSubject.name);
+    console.log('did: ', vcs[0].credentialSubject.id);
+    console.log('issuer_did: ', vcs[0].issuer.id);
 
-{% hint style="info" %}
-The callback URL needs to respond with a 200 status in order to successfully store the credential. If an error code comes back the wallet shown an error screen and does not store the credential in the wallet.&#x20;
-{% endhint %}
+    if(vcs[0].issuer.id === process.env.DID_ISSUER && vcs[0].credentialSubject.id) {
+      const did = vcs[0].credentialSubject.id;
+      const session_id = await redisClient.v4.get('chid:'+authToken)
+      await redisClient.v4.del('chid:'+authToken)
+      await redisClient.set('user:' + did, JSON.stringify({did: did, name: vcs[0].credentialSubject.name, issuer: vcs[0].issuer.name}))
+      console.log(session_id)
+      // here: send VC data relevant for the FE back in the response via websocket
+      const ws = getSocket(session_id);   
+      if(ws) {
+        console.log('Socket found for ', session_id)
+        ws.send(JSON.stringify({
+          error: 0,
+          registrationComplete: true,
+          did: did,
+          email: vcs[0].credentialSubject.Email,
+          name: vcs[0].credentialSubject.name,
+          role: vcs[0].credentialSubject.Role,
+        })) 
+      }        
+    }
+    return res.status(200).json(response.data)
+  } catch (err) {
+    console.log(err)
+    return res.status(403).send('Access denied, invalid VC')
+  }
+}
+```
+
+### Login with a Verifiable Credential
+
+With your browser navigate to `http://<your IP/hostname>:9000/` . The web service loads the login page and shows a QR Code that you scan with the sideos wallet.&#x20;
+
+<figure><img src=".gitbook/assets/Screenshot 2024-04-19 at 14.29.54.png" alt=""><figcaption><p>The Login request QR Code</p></figcaption></figure>
+
+The code that generates the QR Code fetches the data for the request from the sideos API and creates a unique request for a login credential of the type "User". If you have that credential type stored in your wallet the wallet asks you to share the credential with the web service:
+
+<figure><img src=".gitbook/assets/Share Credential.png" alt="" width="375"><figcaption><p>Request to share a Verifiable Credential </p></figcaption></figure>
+
+The code to create a login endpoint to show the QR Code on the frontend and store the session in redis is rather small:
+
+```typescript
+app.route('/login')
+  .get(async (req: Request,res: Response) => {
+    const request = await getLoginCreateReqest()
+    if(request.data.challenge && request.data.jwt) {
+      await redisClient.set('chjwt:'+request.data.challenge, request.data.jwt)
+      await redisClient.set('chid:'+request.data.challenge, req.session.id)
+      const url =  process.env.CALLBACK_URL + "/gettoken/" + request.data.challenge
+      qr.toDataURL(url, (err, qrcode) => {
+        if(err) res.send("Error occured")
+        res.render("login",{qrcode: qrcode, callback_url: process.env.CALLBACK_URL});
+      })
+    }
+  });
+```
+
+Where the function `getLoginCreateReqest()` to call sideos and ask for a credential request uses the template id and the callback url parameters.&#x20;
+
+```typescript
+export const getLoginCreateReqest = async () => {  
+    const challenge = uuidv4();   
+    try {
+      const response = await axios.post(process.env.SSI_SERVER + '/v3/createrequestvc',
+      {
+        templateid: process.env.LOGIN_TEMPLATE_ID,
+        dataset: {},
+        domain: process.env.CALLBACK_URL + '/login',
+        challenge: challenge
+      },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Token': process.env.ACCESS_TOKEN
+        }
+      });
+      return { 
+        data: {
+          error: 0,
+          challenge: challenge,
+          jwt: response.data.data.jwt
+        }
+      }
+    } catch (err) {
+      console.log(`Error posting juno at ${process.env.SSI_SERVER}/v3/createrequestvc`);
+      console.log(err);
+      return {
+        data: {
+          error: `Error posting juno at ${process.env.SSI_SERVER}/v3/createrequestvc`
+        }
+      }  
+    }
+  }
+```
+
+The response from the wallet is send to the callback url which was embedded into the credential request. The function behind the endpoint is `postLoginConsumeReqest()`. This piece of code does the whole work of the user authentication. It checks if the credential is valid by sending it to the validation endpoint of the sideos API, checks if the issuer of the credential can be trusted - we set this part in the .env file as `DID_ISSUER` - and if there is a subject in the credential which holds the data elements we want to use in the web service, eventually.&#x20;
+
+```typescript
+export const postLoginConsumeReqest = async (req: Request, res: Response, next: NextFunction) => {
+  const redisClient = createClient({ legacyMode: true })
+  await redisClient.connect().catch(console.error)
+  
+  try {
+    const jwt = req.body.jwt;
+    let authToken: string = req.params.token;
+    if (!authToken && req.query.challenge) {
+      authToken = <string>req.query.challenge
+    }
+    console.log('Consume Request challenge parameter:', authToken)
+    let vcs: Array<any> = [];
+    const response = await axios.post(process.env.SSI_SERVER + '/v3/consumerequest', {
+      jwt: jwt
+    }, {
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Token': process.env.ACCESS_TOKEN
+      }
+    })
+    response.data.data.payload.verifiableCredential.forEach((element: any) => {
+      vcs.push(element)
+    });
+    console.log('Trusted DID_ISSUER: ', process.env.DID_ISSUER);
+    console.log('email: ', vcs[0].credentialSubject.Email);
+    console.log('Name: ', vcs[0].credentialSubject.name);
+    console.log('did: ', vcs[0].credentialSubject.id);
+    console.log('issuer_did: ', vcs[0].issuer.id);
+
+    if(vcs[0].issuer.id === process.env.DID_ISSUER && vcs[0].credentialSubject.id) {
+      const did = vcs[0].credentialSubject.id;
+      const session_id = await redisClient.v4.get('chid:'+authToken)
+      await redisClient.v4.del('chid:'+authToken)
+      await redisClient.set('vc:'+session_id, JSON.stringify({did: did, name: vcs[0].credentialSubject.name, issuer: vcs[0].issuer.name}))
+
+      // here: send VC data relevant for the FE back in the response via websocket
+      const ws = getSocket(session_id);   
+      if(ws) {
+        console.log('Socket found for ', session_id)
+        ws.send(JSON.stringify({
+          error: 0,
+          authToken: authToken,
+          did: did,
+          email: vcs[0].credentialSubject.Email,
+          name: vcs[0].credentialSubject.name,
+          role: vcs[0].credentialSubject.Role,
+        })) 
+      }        
+    }
+    return res.status(200).json({
+      data: { 
+        error: 0, 
+        payload: vcs
+      }
+    })
+  } catch (err) {
+    return res.status(403).send('Access denied, invalid VC')
+  }
+}
+```
+
+If no error occurs, the web service provides an access token to the browser which then loads the home page for an authenticated user.&#x20;
+
+<figure><img src=".gitbook/assets/Screenshot 2024-04-19 at 19.28.23.png" alt=""><figcaption><p>After sucessful authentication the user is logged in</p></figcaption></figure>
+

@@ -12,6 +12,10 @@ The <mark style="color:purple;">**sideos administration console**</mark> is the 
 
 There is no username and password being used and you will login with SSI credentials, so the first thing you will require is the sideos wallet for iOS or Android Application which is called Sideos Transponder ([**android**](https://play.google.com/store/apps/details?id=com.sideosmobile) **|** [**iOS**](https://apps.apple.com/de/app/sideos-transponder/id1611001158?l=en)). Once the app is downloaded, the signup process can begin.&#x20;
 
+{% embed url="https://vimeo.com/801604035" %}
+Creating a sideos console account
+{% endembed %}
+
 ## Signing up for the first time
 
 Visit our [**Onboarding Page**](https://juno.sideos.io/plan-onboarding/1) to start the signup process. From here, insert the required information and scan the QR Code. Now you will receive a credential on your app which is linked to your device and thus cannot be copied by any external party.&#x20;

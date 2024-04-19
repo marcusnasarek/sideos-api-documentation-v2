@@ -5,6 +5,7 @@
 * [Sign up & get started](sign-up-and-get-started/README.md)
   * [Creating a Credential Type](sign-up-and-get-started/creating-a-credential-type.md)
   * [Add an Admin](sign-up-and-get-started/add-an-admin.md)
+* [Issue a Verifiable Credential](issue-a-verifiable-credential.md)
 * [How to delete your Data](how-to-delete-your-data.md)
 
 ## Reference
