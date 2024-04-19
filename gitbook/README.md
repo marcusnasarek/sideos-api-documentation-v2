@@ -35,7 +35,21 @@ That said, the general setup is therefore two-folded for 1) providing data and 2
 
 <figure><img src=".gitbook/assets/figure Home 1.png" alt=""><figcaption><p>issuing and verifying credentials</p></figcaption></figure>
 
-The API is build around these 2 general flows. We've prepared an example for a small web service that integrates with the sideos API to provide a passwordless login bases on SSI credentials. You can start from there to see the API in action and get your hands dirty:
+The API is build around these 2 general flows.&#x20;
+
+## Setting the Scene
+
+There are 3 basic components in an SSI flow:&#x20;
+
+1. **The SSI wallet**. Credentials will be stored in an SSI wallet. The wallet manages the cryptographic keys, interacts with issuers and verifiers and allows the user to decide which credentials are to be stored to shared.&#x20;
+2. **The Issuer**. Credentials are created by an issuer and provided to the Holder of the SSI wallet. Issuers converting data to verifiable credentials by building JSON data files following the SSI standards, in our case the W3C DID specification and signing the credentials with their private key.
+3. **The Verifier**. Credentials provided by an SSI wallet can be used for example to login into a web service. The web service verifies the credential and checks the claims, the signatures, and who issued the credentials. If all is ok, the web services grants access eventually.
+
+sideos helps Issuers and Verifiers to use the SSI protocol with very little effort. The API is called to wrap data into SSI protocol and allow for example a Web Service to interact with SSI wallets.&#x20;
+
+## Starting with an Example
+
+We've prepared an example for a small web service that integrates with the sideos API to provide a passwordless login bases on SSI credentials. You can start from there to see the API in action and get your hands dirty:
 
 {% content-ref url="quick-start.md" %}
 [quick-start.md](quick-start.md)

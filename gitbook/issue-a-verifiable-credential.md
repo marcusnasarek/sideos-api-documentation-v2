@@ -1,15 +1,5 @@
 # Issue a Verifiable Credential
 
-## Setting the Scene
-
-There are 3 basic components in an SSI flow:&#x20;
-
-1. **The SSI wallet**. Credentials will be stored in an SSI wallet. The wallet manages the cryptographic keys, interacts with issuers and verifiers and allows the user to decide which credentials are to be stored to shared.&#x20;
-2. **The Issuer**. Credentials are created by an issuer and provided to the Holder of the SSI wallet. Issuers converting data to verifiable credentials by building JSON data files following the SSI standards, in our case the W3C DID specification and signing the credentials with their private key.
-3. **The Verifier**. Credentials provided by an SSI wallet can be used for example to login into a web service. The web service verifies the credential and checks the claims, the signatures, and who issued the credentials. If all is ok, the web services grants access eventually.
-
-sideos helps Issuers and Verifiers to use the SSI protocol with very little effort. The API is called to wrap data into SSI protocol and allow for example a Web Service to interact with SSI wallets.&#x20;
-
 Lets assume you want to provide a user with a credential, e.g. to provide a login credential for a web service. In that example, the **Web Service** is the **issuer** and will create a login credential from a user's _Name_ and _Email Address_ with the help of the **sideos API.** The Web Service will then offer the credential to the **SSI Wallet** that stores the credential securely for the later use as a Login credential.
 
 <figure><img src=".gitbook/assets/Basic Credential Offer.png" alt=""><figcaption><p>A basic credential issuance flow</p></figcaption></figure>
